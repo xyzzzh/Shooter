@@ -15,30 +15,6 @@ AShooterCharacter::AShooterCharacter()
 void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Warning, TEXT("BeginPlay() called!"));
-
-	int myInt{ 42 };
-	UE_LOG(LogTemp, Warning, TEXT("int myInt: %d"), myInt);
-
-	float myFloat{ 3.1415f };
-	UE_LOG(LogTemp, Warning, TEXT("float myFloat: %f"), myFloat);
-
-	double myDouble{ 0.000756 };
-	UE_LOG(LogTemp, Warning, TEXT("double myDouble: %lf"),  myDouble);
-
-	char myChar{ 'J' };
-	UE_LOG(LogTemp, Warning, TEXT("char myChar: %c"), myChar);
-
-	wchar_t wideChar{ L'J' };
-	UE_LOG(LogTemp, Warning, TEXT("wchar_t wideCharr: %lc"), wideChar);
-
-	bool myBool{ true };
-	UE_LOG(LogTemp, Warning, TEXT("bool myBool: %d"), myBool);
-
-	FString myString{ TEXT("My String !!!") };
-	UE_LOG(LogTemp, Warning, TEXT("FString myString: %s"), *myString);
-
-	UE_LOG(LogTemp, Warning, TEXT("Name of the instance: %s"), *GetName());
 
 }
 
