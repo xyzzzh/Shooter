@@ -3,6 +3,7 @@
 
 #include "ShooterCharacter.h"
 
+#include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 // Sets default values
@@ -15,6 +16,10 @@ AShooterCharacter::AShooterCharacter()
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 300.0f;
 	CameraBoom->bUsePawnControlRotation = true;
+
+	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
+	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // 将相机连接到弹簧臂末端
+	FollowCamera->bUsePawnControlRotation = false; // 相对于弹簧臂不旋转
 }
 
 // Called when the game starts or when spawned
