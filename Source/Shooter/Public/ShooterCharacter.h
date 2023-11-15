@@ -10,6 +10,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class USoundCue;
 class UParticleSystem;
+class UAnimMontage;
 
 UCLASS()
 class SHOOTER_API AShooterCharacter : public ACharacter
@@ -64,6 +65,10 @@ private:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = true))
 	UParticleSystem* MuzzleFlash;
+
+	/* Montage for firing weapon */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = true))
+	UAnimMontage* HipFireMontage;
 
 public:
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
