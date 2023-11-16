@@ -83,7 +83,7 @@ void AShooterCharacter::LookUpAtRate(float Rate)
 
 void AShooterCharacter::FireWeapon()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Fire Weapon!"))
+	//UE_LOG(LogTemp, Warning, TEXT("Fire Weapon!"))
 	if (FireSound) {
 		UGameplayStatics::PlaySound2D(this, FireSound);
 	}
@@ -96,107 +96,29 @@ void AShooterCharacter::FireWeapon()
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
 		}
 
-		// 获取当前viewport大小
-		FVector2D ViewportSize;
-		if (GEngine && GEngine->GameViewport) {
-			GEngine->GameViewport->GetViewportSize(ViewportSize);
-		}
+		FVector BeamEnd;
+		bool bBeamEnd = GetBeamEndLocation(
+			SocketTransform.GetLocation(),
+			BeamEnd);
 
-		// 获取crosshair的屏幕空间位置
-		FVector2D CrosshairLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
-		CrosshairLocation.Y -= 50.f;
-		FVector CrosshairWorldPosition;
-		FVector CrosshairWorldDirection;
-
-		// 获取crosshair的世界坐标和世界方向
-		bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
-			UGameplayStatics::GetPlayerController(this, 0), 
-			CrosshairLocation, 
-			CrosshairWorldPosition, 
-			CrosshairWorldDirection);
-
-		if (bScreenToWorld) {
-			FHitResult ScreenTraceHit;
-			const FVector Start{ CrosshairWorldPosition };
-			const FVector End{ CrosshairWorldPosition + CrosshairWorldDirection * 50'000.f };
-
-			// 设置beam end点为跟踪线end点
-			FVector BeamEndPoint{ End };
-
-			// 沿着crosshair世界坐标跟踪
-			GetWorld()->LineTraceSingleByChannel(
-				ScreenTraceHit, 
-				Start, 
-				End, 
-				ECollisionChannel::ECC_Visibility);
-
-			if (ScreenTraceHit.bBlockingHit) { // 如果击中
-				// beam end点为击中点
-				BeamEndPoint = ScreenTraceHit.Location;
-			}
-
-			// 执行二次跟踪，本次跟踪始于gun barrel
-			FHitResult WeaponTraceHit;
-			const FVector WeaponTraceStart{ SocketTransform.GetLocation() };
-			const FVector WeaponTraceEnd{ BeamEndPoint };
-			GetWorld()->LineTraceSingleByChannel(
-				WeaponTraceHit,
-				WeaponTraceStart,
-				WeaponTraceEnd,
-				ECollisionChannel::ECC_Visibility);
-
-			if (WeaponTraceHit.bBlockingHit) {
-				BeamEndPoint = WeaponTraceHit.Location;
-			}
-
+		if (bBeamEnd) {
 			if (ImpactParticles) {
 				UGameplayStatics::SpawnEmitterAtLocation(
-					GetWorld(), 
-					ImpactParticles, 
-					BeamEndPoint);
+					GetWorld(),
+					ImpactParticles,
+					BeamEnd);
 			}
 
-			// 光束粒子动画
-			if (BeamParticles) {
-				UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(
-					GetWorld(), 
-					BeamParticles, 
-					SocketTransform);
-
-				if (Beam) {
-					Beam->SetVectorParameter(FName("Target"), BeamEndPoint);
-				}
-			}
-		}
-
-		/*
-		FHitResult FireHit;
-		const FVector Start{ SocketTransform.GetLocation() };
-		const FQuat Rotation{ SocketTransform.GetRotation() };
-		const FVector RotationAxis{ Rotation.GetAxisX() };
-		const FVector End{ Start + RotationAxis * 50'000.f };
-
-		FVector BeamEndPoint{ End };
-
-		GetWorld()->LineTraceSingleByChannel(FireHit, Start, End, ECollisionChannel::ECC_Visibility);
-		if (FireHit.bBlockingHit) {
-			//DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
-			//DrawDebugPoint(GetWorld(), FireHit.Location, 5.f, FColor::Red, false, 2.f);
-
-			BeamEndPoint = FireHit.Location;
-
-			if (ImpactParticles) {
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FireHit.Location);
-			}
-		}
-
-		if (BeamParticles) {
-			UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, SocketTransform);
+			UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(
+				GetWorld(),
+				BeamParticles,
+				SocketTransform);
 			if (Beam) {
-				Beam->SetVectorParameter(FName("Target"), BeamEndPoint);
+				Beam->SetVectorParameter(FName("Target"), BeamEnd);
 			}
+				
 		}
-		*/
+
 	}
 	
 
@@ -205,6 +127,68 @@ void AShooterCharacter::FireWeapon()
 		AnimInstance->Montage_Play(HipFireMontage);
 		AnimInstance->Montage_JumpToSection(FName("StartFire"));
 	}
+}
+
+bool AShooterCharacter::GetBeamEndLocation(
+	const FVector& MuzzleSocketLocation, 
+	FVector& OutBeamLocation)
+{
+	// 获取当前viewport大小
+	FVector2D ViewportSize;
+	if (GEngine && GEngine->GameViewport) {
+		GEngine->GameViewport->GetViewportSize(ViewportSize);
+	}
+
+	// 获取crosshair的屏幕空间位置
+	FVector2D CrosshairLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
+	CrosshairLocation.Y -= 50.f;
+	FVector CrosshairWorldPosition;
+	FVector CrosshairWorldDirection;
+
+	// 获取crosshair的世界坐标和世界方向
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(this, 0),
+		CrosshairLocation,
+		CrosshairWorldPosition,
+		CrosshairWorldDirection);
+
+	if (bScreenToWorld) {
+		FHitResult ScreenTraceHit;
+		const FVector Start{ CrosshairWorldPosition };
+		const FVector End{ CrosshairWorldPosition + CrosshairWorldDirection * 50'000.f };
+
+		// 设置beam end点为跟踪线end点
+		OutBeamLocation = End;
+
+		// 沿着crosshair世界坐标跟踪
+		GetWorld()->LineTraceSingleByChannel(
+			ScreenTraceHit,
+			Start,
+			End,
+			ECollisionChannel::ECC_Visibility);
+
+		if (ScreenTraceHit.bBlockingHit) { // 如果击中
+			// beam end点为击中点
+			OutBeamLocation = ScreenTraceHit.Location;
+		}
+
+		// 执行二次跟踪，本次跟踪始于gun barrel
+		FHitResult WeaponTraceHit;
+		const FVector WeaponTraceStart{ MuzzleSocketLocation };
+		const FVector WeaponTraceEnd{ OutBeamLocation };
+		GetWorld()->LineTraceSingleByChannel(
+			WeaponTraceHit,
+			WeaponTraceStart,
+			WeaponTraceEnd,
+			ECollisionChannel::ECC_Visibility);
+
+		if (WeaponTraceHit.bBlockingHit) {
+			OutBeamLocation = WeaponTraceHit.Location;
+		}
+		return true;
+	}
+
+	return false;
 }
 
 // Called every frame
