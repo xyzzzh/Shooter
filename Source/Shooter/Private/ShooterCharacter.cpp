@@ -133,11 +133,30 @@ void AShooterCharacter::FireWeapon()
 			if (ScreenTraceHit.bBlockingHit) { // 如果击中
 				// beam end点为击中点
 				BeamEndPoint = ScreenTraceHit.Location;
-
-				if (ImpactParticles) {
-					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, ScreenTraceHit.Location);
-				}
 			}
+
+			// 执行二次跟踪，本次跟踪始于gun barrel
+			FHitResult WeaponTraceHit;
+			const FVector WeaponTraceStart{ SocketTransform.GetLocation() };
+			const FVector WeaponTraceEnd{ BeamEndPoint };
+			GetWorld()->LineTraceSingleByChannel(
+				WeaponTraceHit,
+				WeaponTraceStart,
+				WeaponTraceEnd,
+				ECollisionChannel::ECC_Visibility);
+
+			if (WeaponTraceHit.bBlockingHit) {
+				BeamEndPoint = WeaponTraceHit.Location;
+			}
+
+			if (ImpactParticles) {
+				UGameplayStatics::SpawnEmitterAtLocation(
+					GetWorld(), 
+					ImpactParticles, 
+					BeamEndPoint);
+			}
+
+			// 光束粒子动画
 			if (BeamParticles) {
 				UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(
 					GetWorld(), 
