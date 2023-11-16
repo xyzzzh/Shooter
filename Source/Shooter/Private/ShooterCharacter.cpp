@@ -96,6 +96,61 @@ void AShooterCharacter::FireWeapon()
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
 		}
 
+		// 获取当前viewport大小
+		FVector2D ViewportSize;
+		if (GEngine && GEngine->GameViewport) {
+			GEngine->GameViewport->GetViewportSize(ViewportSize);
+		}
+
+		// 获取crosshair的屏幕空间位置
+		FVector2D CrosshairLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
+		CrosshairLocation.Y -= 50.f;
+		FVector CrosshairWorldPosition;
+		FVector CrosshairWorldDirection;
+
+		// 获取crosshair的世界坐标和世界方向
+		bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
+			UGameplayStatics::GetPlayerController(this, 0), 
+			CrosshairLocation, 
+			CrosshairWorldPosition, 
+			CrosshairWorldDirection);
+
+		if (bScreenToWorld) {
+			FHitResult ScreenTraceHit;
+			const FVector Start{ CrosshairWorldPosition };
+			const FVector End{ CrosshairWorldPosition + CrosshairWorldDirection * 50'000.f };
+
+			// 设置beam end点为跟踪线end点
+			FVector BeamEndPoint{ End };
+
+			// 沿着crosshair世界坐标跟踪
+			GetWorld()->LineTraceSingleByChannel(
+				ScreenTraceHit, 
+				Start, 
+				End, 
+				ECollisionChannel::ECC_Visibility);
+
+			if (ScreenTraceHit.bBlockingHit) { // 如果击中
+				// beam end点为击中点
+				BeamEndPoint = ScreenTraceHit.Location;
+
+				if (ImpactParticles) {
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, ScreenTraceHit.Location);
+				}
+			}
+			if (BeamParticles) {
+				UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(
+					GetWorld(), 
+					BeamParticles, 
+					SocketTransform);
+
+				if (Beam) {
+					Beam->SetVectorParameter(FName("Target"), BeamEndPoint);
+				}
+			}
+		}
+
+		/*
 		FHitResult FireHit;
 		const FVector Start{ SocketTransform.GetLocation() };
 		const FQuat Rotation{ SocketTransform.GetRotation() };
@@ -122,8 +177,9 @@ void AShooterCharacter::FireWeapon()
 				Beam->SetVectorParameter(FName("Target"), BeamEndPoint);
 			}
 		}
+		*/
 	}
-
+	
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && HipFireMontage) {
