@@ -30,11 +30,12 @@ AShooterCharacter::AShooterCharacter():
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // 将相机连接到弹簧臂末端
 	FollowCamera->bUsePawnControlRotation = false; // 相对于弹簧臂不旋转
 
+	// 不旋转角色，只旋转相机
 	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
-	bUseControllerRotationYaw = false;
 
-	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
 	GetCharacterMovement()->JumpZVelocity = 600.0f;
 	GetCharacterMovement()->AirControl = 0.2f;
