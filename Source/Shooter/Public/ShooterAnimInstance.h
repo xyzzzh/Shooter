@@ -39,4 +39,7 @@ private:
 	/* 用于保存停止运动前最后的movement offset yaw */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = true))
 	float LastMovementOffsetYaw;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = true))
+	bool bAiming;
 };
