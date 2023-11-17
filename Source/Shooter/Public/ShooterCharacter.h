@@ -37,6 +37,14 @@ protected:
 	// called via input to look up/down at a given rate
 	void LookUpAtRate(float Rate);
 
+	// rotate controller based on mouse X movement
+	// @param Value: the input value from mouse movement
+	void Turn(float Value);
+
+	// rotate controller based on mouse Y movement
+	// @param Value: the input value from mouse movement
+	void LookUp(float Value);
+
 	// called when fire button is pressed
 	void FireWeapon();
 
@@ -48,6 +56,9 @@ protected:
 
 	//set current camera field of view
 	void CameraInterpZoom(float DeltaTime);
+
+	// set base turn & lookup rate
+	void SetLookRates();
 
 public:
 	// Called every frame
@@ -68,6 +79,28 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true))
 	float BaseLookUpRate;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true))
+	float HipTurnRate;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true))
+	float HipLookUpRate;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true))
+	float AimingTurnRate;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true))
+	float AimingLookUpRate;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true), meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+	float MouseHipTurnRate;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true), meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+	float MouseHipLookUpRate;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true), meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+	float MouseAimingTurnRate;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true), meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+	float MouseAimingLookUpRate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = true))
 	USoundCue* FireSound;
