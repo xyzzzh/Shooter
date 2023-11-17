@@ -31,4 +31,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = true))
 	bool bIsAccerlerating;
+
+	/* 用于扫射的Yaw偏移量 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = true))
+	float MovementOffsetYaw;
 };
