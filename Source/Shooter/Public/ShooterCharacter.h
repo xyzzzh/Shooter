@@ -42,6 +42,10 @@ protected:
 
 	bool GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation);
 
+	//set bAiming to true or false with button press
+	void AimingButtonPressed();
+	void AimingButtonReleased();
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -69,16 +73,26 @@ private:
 	UParticleSystem* MuzzleFlash;
 
 	/* Montage for firing weapon */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = true))
 	UAnimMontage* HipFireMontage;
 
 	/* Particles spawned upon bullet impact */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = true))
 	UParticleSystem* ImpactParticles;
 
-	/* Smoke trail for bullets*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = true))
+	/* Smoke trail for bullets */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = true))
 	UParticleSystem* BeamParticles;
+
+	//True when aiming
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = true))
+	bool bAiming;
+
+	//Default camera field of view value
+	float CameraDefaultFOV;
+
+	//Field of view value for when zoom in
+	float CameraZoomFOV;
 
 public:
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
