@@ -35,4 +35,8 @@ private:
 	/* 用于扫射的Yaw偏移量 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = true))
 	float MovementOffsetYaw;
+
+	/* 用于保存停止运动前最后的movement offset yaw */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = true))
+	float LastMovementOffsetYaw;
 };
