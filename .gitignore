@@ -78,3 +78,17 @@ DerivedDataCache/*
 
 # Model
 /Content/ParagonLtBelica*
+
+# maps assets
+/Content/Textures/*
+/Content/Audio/*
+/Content/Blueprints/*
+/Content/Collections/*
+/Content/Developers/*
+/Content/Fx/*
+/Content/Maps/*
+/Content/Materials/*
+/Content/Meshes/*
+/Content/Sequences/*
+/Content/Textures/*
+/Content/_Game/Maps/*
