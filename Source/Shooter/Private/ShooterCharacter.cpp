@@ -199,60 +199,33 @@ bool AShooterCharacter::GetBeamEndLocation(
 	const FVector& MuzzleSocketLocation, 
 	FVector& OutBeamLocation)
 {
-	// 获取当前viewport大小
-	FVector2D ViewportSize;
-	if (GEngine && GEngine->GameViewport) {
-		GEngine->GameViewport->GetViewportSize(ViewportSize);
+	//check for crosshair trace hit
+	FHitResult CrosshairHitResult;
+	bool bCrosshairHit = TraceUnderCrosshairs(CrosshairHitResult, OutBeamLocation);
+
+	if (bCrosshairHit) {
+		OutBeamLocation = CrosshairHitResult.Location;
+	}
+	else {
+		//OutBeamLocation is the end location for the line trace
 	}
 
-	// 获取crosshair的屏幕空间位置
-	FVector2D CrosshairLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
-	FVector CrosshairWorldPosition;
-	FVector CrosshairWorldDirection;
+	// 执行二次跟踪，本次跟踪始于gun barrel
+	FHitResult WeaponTraceHit;
+	const FVector WeaponTraceStart{ MuzzleSocketLocation };
+	const FVector StartToEnd{ OutBeamLocation - MuzzleSocketLocation };
+	const FVector WeaponTraceEnd{ MuzzleSocketLocation + StartToEnd * 1.2f };
+	GetWorld()->LineTraceSingleByChannel(
+		WeaponTraceHit,
+		WeaponTraceStart,
+		WeaponTraceEnd,
+		ECollisionChannel::ECC_Visibility);
 
-	// 获取crosshair的世界坐标和世界方向
-	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
-		UGameplayStatics::GetPlayerController(this, 0),
-		CrosshairLocation,
-		CrosshairWorldPosition,
-		CrosshairWorldDirection);
-
-	if (bScreenToWorld) {
-		FHitResult ScreenTraceHit;
-		const FVector Start{ CrosshairWorldPosition };
-		const FVector End{ CrosshairWorldPosition + CrosshairWorldDirection * 50'000.f };
-
-		// 设置beam end点为跟踪线end点
-		OutBeamLocation = End;
-
-		// 沿着crosshair世界坐标跟踪
-		GetWorld()->LineTraceSingleByChannel(
-			ScreenTraceHit,
-			Start,
-			End,
-			ECollisionChannel::ECC_Visibility);
-
-		if (ScreenTraceHit.bBlockingHit) { // 如果击中
-			// beam end点为击中点
-			OutBeamLocation = ScreenTraceHit.Location;
-		}
-
-		// 执行二次跟踪，本次跟踪始于gun barrel
-		FHitResult WeaponTraceHit;
-		const FVector WeaponTraceStart{ MuzzleSocketLocation };
-		const FVector WeaponTraceEnd{ OutBeamLocation };
-		GetWorld()->LineTraceSingleByChannel(
-			WeaponTraceHit,
-			WeaponTraceStart,
-			WeaponTraceEnd,
-			ECollisionChannel::ECC_Visibility);
-
-		if (WeaponTraceHit.bBlockingHit) {
-			OutBeamLocation = WeaponTraceHit.Location;
-		}
+	if (WeaponTraceHit.bBlockingHit) {
+		OutBeamLocation = WeaponTraceHit.Location;
 		return true;
 	}
-
+	
 	return false;
 }
 
@@ -380,7 +353,7 @@ void AShooterCharacter::AutoFireReset()
 	}
 }
 
-bool AShooterCharacter::TraceUnderCrosshairs(FHitResult& OutHitResult)
+bool AShooterCharacter::TraceUnderCrosshairs(FHitResult& OutHitResult, FVector& OutHitLocation)
 {
 	// 获取当前viewport大小
 	FVector2D ViewportSize;
@@ -404,6 +377,7 @@ bool AShooterCharacter::TraceUnderCrosshairs(FHitResult& OutHitResult)
 		//trac from crosshair world location outward
 		const FVector Start{ CrosshairWorldPosition };
 		const FVector End{ Start + CrosshairWorldDirection * 50'000.f };
+		OutHitLocation = End;
 		GetWorld()->LineTraceSingleByChannel(
 			OutHitResult,
 			Start,
@@ -411,6 +385,7 @@ bool AShooterCharacter::TraceUnderCrosshairs(FHitResult& OutHitResult)
 			ECollisionChannel::ECC_Visibility
 		);
 		if (OutHitResult.bBlockingHit) {
+			OutHitLocation = OutHitResult.Location;
 			return true;
 		}
 	}
@@ -430,7 +405,8 @@ void AShooterCharacter::Tick(float DeltaTime)
 	CalculateCrosshairSpread(DeltaTime);
 
 	FHitResult ItemTraceResult;
-	TraceUnderCrosshairs(ItemTraceResult);
+	FVector HitLocation;
+	TraceUnderCrosshairs(ItemTraceResult, HitLocation);
 	if (ItemTraceResult.bBlockingHit) {
 		AItem* HitItem = Cast<AItem>(ItemTraceResult.Actor);
 		if (HitItem && HitItem->GetPickupWidget()) {
