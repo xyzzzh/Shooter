@@ -94,3 +94,9 @@ DerivedDataCache/*
 /Content/_Game/Maps/*
 /Content/_Game/Assets/Fonts/*
 /Content/_Game/Assets/Textures/*
+/Content/_Game/Assets/Sounds/*
+/Content/_Game/Assets/Sounds/GunShots/*
+/Content/ModSciInteriors/*
+/Content/ModSci_Engineer/*
+/Content/ModSci_EngiProps/*
+
