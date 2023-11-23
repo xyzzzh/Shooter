@@ -10,7 +10,8 @@
 // Sets default values
 AItem::AItem() :
 	ItemName(FString("Default")),
-	ItemCount(0)
+	ItemCount(0),
+	ItemRarity(EItemRarity::EIR_Common)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -36,7 +37,11 @@ void AItem::BeginPlay()
 	Super::BeginPlay();
 	
 	//hide pickup widget
-	PickupWidget->SetVisibility(false);
+	if (PickupWidget) {
+		PickupWidget->SetVisibility(false);
+	}
+	
+	SetActivateStars();
 
 	// setup overlap for areasphere
 	AreaSphere->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnSphereOverlap);
@@ -61,6 +66,43 @@ void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlapedComponent, AActor* 
 			ShooterCharacter->IncrementOverlappedItemCount(-1);
 		}
 	}
+}
+
+void AItem::SetActivateStars()
+{
+	// the 0 element isn't used
+	for (int32 i = 0; i <= 5; i++) {
+		ActivateStars.Add(false);
+	}
+
+	switch (ItemRarity) {
+	case EItemRarity::EIR_Damaged:
+		ActivateStars[1] = true;
+		break;
+	case EItemRarity::EIR_Common:
+		ActivateStars[1] = true;
+		ActivateStars[2] = true;
+		break;
+	case EItemRarity::EIR_Uncommon:
+		ActivateStars[1] = true;
+		ActivateStars[2] = true; 
+		ActivateStars[3] = true;
+		break;
+	case EItemRarity::EIR_Rare:
+		ActivateStars[1] = true;
+		ActivateStars[2] = true;
+		ActivateStars[3] = true;
+		ActivateStars[4] = true;
+		break;
+	case EItemRarity::EIR_Legendary:
+		ActivateStars[1] = true;
+		ActivateStars[2] = true;
+		ActivateStars[3] = true;
+		ActivateStars[4] = true;
+		ActivateStars[5] = true;
+		break;
+	}
+	
 }
 
 // Called every frame
