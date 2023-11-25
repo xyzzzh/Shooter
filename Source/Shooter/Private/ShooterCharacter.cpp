@@ -556,3 +556,11 @@ FVector AShooterCharacter::GetCameraInterpLocation()
 	const FVector CameraForward{ FollowCamera->GetForwardVector() };
 	return CameraWorldLocation + CameraForward*CameraInterpDistance + FVector(0.f, 0.f, CameraInterpElevation);
 }
+
+void AShooterCharacter::GetPickupItem(AItem* Item)
+{
+	auto Weapon = Cast<AWeapon>(Item);
+	if (Weapon) {
+		SwapWeapon(Weapon);
+	}
+}
