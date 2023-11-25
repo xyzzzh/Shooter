@@ -93,6 +93,9 @@ protected:
 
 	void SelectButtonPressed();
 	void SelectButtonReleased();
+
+	//drops currently equipped weapon and equips TraceItemWeapon
+	void SwapWeapon(AWeapon* WeaponToSwap);
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -224,6 +227,10 @@ private:
 	//this class or any class drived from this class
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AWeapon> DefaultWeaponClass;
+
+	//the item currently hit by our trace in TraceForItem() (could be nullptr)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	AItem* TraceHitItem;
 
 public:
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

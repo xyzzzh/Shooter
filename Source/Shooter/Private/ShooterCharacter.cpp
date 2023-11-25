@@ -408,14 +408,14 @@ void AShooterCharacter::TraceForItems()
 		FVector HitLocation;
 		TraceUnderCrosshairs(ItemTraceResult, HitLocation);
 		if (ItemTraceResult.bBlockingHit) {
-			AItem* HitItem = Cast<AItem>(ItemTraceResult.Actor);
-			if (HitItem && HitItem->GetPickupWidget()) {
+			TraceHitItem = Cast<AItem>(ItemTraceResult.Actor);
+			if (TraceHitItem && TraceHitItem->GetPickupWidget()) {
 				//show item's pickup widget
-				HitItem->GetPickupWidget()->SetVisibility(true);
+				TraceHitItem->GetPickupWidget()->SetVisibility(true);
 			}
 
 			if (TraceHitItemLastFrame) {
-				if (HitItem != TraceHitItemLastFrame) {
+				if (TraceHitItem != TraceHitItemLastFrame) {
 					// we are hitting a different AItem this frame from last frame
 					// or AItem is null
 					TraceHitItemLastFrame->GetPickupWidget()->SetVisibility(false);
@@ -423,7 +423,7 @@ void AShooterCharacter::TraceForItems()
 			}
 
 			// store a reference tp HitItem for next frame
-			TraceHitItemLastFrame = HitItem;
+			TraceHitItemLastFrame = TraceHitItem;
 		}
 	}
 	else if (TraceHitItemLastFrame) {
@@ -470,11 +470,23 @@ void AShooterCharacter::DropWeapon()
 
 void AShooterCharacter::SelectButtonPressed()
 {
-	DropWeapon();
+	if (TraceHitItem) {
+		auto TraceHitWeapon = Cast<AWeapon>(TraceHitItem);
+		SwapWeapon(TraceHitWeapon);
+		TraceHitItem = nullptr;
+		TraceHitItemLastFrame = nullptr;
+	}
+	
 }
 
 void AShooterCharacter::SelectButtonReleased()
 {
+}
+
+void AShooterCharacter::SwapWeapon(AWeapon* WeaponToSwap)
+{
+	DropWeapon();
+	EquipWeapon(WeaponToSwap);
 }
 
 // Called every frame
