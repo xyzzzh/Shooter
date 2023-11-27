@@ -68,6 +68,9 @@ protected:
 	//called when ItemInterpTimer is finished
 	void FinishInterping();
 
+	//handles item interpolation when in the equipInterping state
+	void ItemInterp(float DeltaTime);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -146,5 +149,5 @@ public:
 	void SetItemState(EItemState State);
 	FORCEINLINE USkeletalMeshComponent* GetItemMesh() const { return ItemMesh; }
 	//called from the AShooterCharacter class
-	void StartItemCUrve(AShooterCharacter* Char);
+	void StartItemCurve(AShooterCharacter* Char);
 };
