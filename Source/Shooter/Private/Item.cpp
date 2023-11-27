@@ -209,6 +209,14 @@ void AItem::ItemInterp(float DeltaTime)
 		//scale factor to multiply with CurveValue
 		const float DeltaZ = ItemToCamera.Size();
 
+		const FVector CurrentLocation = { GetActorLocation() };
+		//Interpolated X and Y values
+		const float InterpXValue = FMath::FInterpTo(CurrentLocation.X, CameraInterpLocation.X, DeltaTime, 30.f);
+		const float InterpYValue = FMath::FInterpTo(CurrentLocation.Y, CameraInterpLocation.Y, DeltaTime, 30.f);
+
+		ItemLocation.X = InterpXValue;
+		ItemLocation.Y = InterpYValue;
+
 		//Adding curve value to the Z component of the Initial Location(scaled by DeltaZ)
 		ItemLocation.Z += CurveValue * DeltaZ;
 		SetActorLocation(ItemLocation, true, nullptr, ETeleportType::TeleportPhysics);

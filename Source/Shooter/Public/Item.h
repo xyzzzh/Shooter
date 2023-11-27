@@ -139,8 +139,6 @@ private:
 	class AShooterCharacter* Character;
 
 
-
-
 public:
 	FORCEINLINE UWidgetComponent* GetPickupWidget() const { return PickupWidget; }
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
