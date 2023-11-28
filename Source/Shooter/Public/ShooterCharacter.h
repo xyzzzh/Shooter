@@ -12,6 +12,14 @@ class USoundCue;
 class UParticleSystem;
 class UAnimMontage;
 
+UENUM(BlueprintType)
+enum class EAmmoType : uint8 {
+	EAT_9mm UMETA(DisplayName = "9mm"),
+	EAT_AR UMETA(DisplayName = "AssaultRifle"),
+
+	EAT_MAX UMETA(DisplayName = "DefaultMAX")	
+};
+
 UCLASS()
 class SHOOTER_API AShooterCharacter : public ACharacter
 {
@@ -96,6 +104,8 @@ protected:
 
 	//drops currently equipped weapon and equips TraceItemWeapon
 	void SwapWeapon(AWeapon* WeaponToSwap);
+
+	void InitializeAmmoMap();
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -240,6 +250,15 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Items, meta = (AllowPrivateAccess = "true"))
 	float CameraInterpElevation;
 
+	//map to keep track of ammo of the different ammo types
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Items, meta = (AllowPrivateAccess = "true"))
+	TMap<EAmmoType, int32> AmmoMap;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Items, meta = (AllowPrivateAccess = "true"))
+	int32 Starting9mmAmmo;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Items, meta = (AllowPrivateAccess = "true"))
+	int32 StartingARAmmo;
 public:
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
