@@ -199,7 +199,6 @@ void AShooterCharacter::FireWeapon()
 		}
 
 	}
-	
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && HipFireMontage) {
