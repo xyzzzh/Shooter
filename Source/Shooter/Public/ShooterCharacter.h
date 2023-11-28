@@ -106,6 +106,9 @@ protected:
 	void SwapWeapon(AWeapon* WeaponToSwap);
 
 	void InitializeAmmoMap();
+
+	// check to make sure weapon has ammo
+	bool WeaponHasAmmo();
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
