@@ -110,7 +110,7 @@ protected:
 
 	void SelectButtonPressed();
 	void SelectButtonReleased();
-
+	
 	//drops currently equipped weapon and equips TraceItemWeapon
 	void SwapWeapon(AWeapon* WeaponToSwap);
 
@@ -119,11 +119,16 @@ protected:
 	// check to make sure weapon has ammo
 	bool WeaponHasAmmo();
 
+	// fireweapon func
 	void PlayFireSound();
-
 	void SendBullet();
-
 	void PlayGunFireMontage();
+
+	// bound to the R key and Gamepad Face Button Left 
+	void ReloadButtonPressed();
+
+	// Handle reloading of the weapon
+	void ReloadWeapon();
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -282,6 +287,12 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	ECombatState CombatState;
 
+	/* Montage for reload animation */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* ReloadMontage;
+	
+	UFUNCTION(BlueprintCallable)
+	void FinishReloading();
 public:
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
