@@ -604,6 +604,28 @@ bool AShooterCharacter::CarryAmmo()
 	return false;
 }
 
+void AShooterCharacter::GrabClip()
+{
+	if (EquippedWeapon == nullptr) return;
+
+	// index for the clip bone on the equipped weapon
+	int32 ClipBoneIndex{EquippedWeapon->GetItemMesh()->GetBoneIndex(EquippedWeapon->GetClipBoneName())};
+	// store the transform of the clip
+	ClipTransform = EquippedWeapon->GetItemMesh()->GetBoneTransform(ClipBoneIndex);
+
+	FAttachmentTransformRules AttachmentRules(EAttachmentRule::KeepRelative, true);
+	HandSceneComponent->AttachToComponent(GetMesh(), AttachmentRules, FName(TEXT("Hand_L")));
+	HandSceneComponent->SetWorldTransform(ClipTransform);
+	
+	EquippedWeapon->SetMovingClip(true);
+
+}
+
+void AShooterCharacter::ReleaseClip()
+{
+	EquippedWeapon->SetMovingClip(false);
+}
+
 // Called every frame
 void AShooterCharacter::Tick(float DeltaTime)
 {
@@ -650,10 +672,10 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 void AShooterCharacter::FinishReloading()
 {
 	CombatState = ECombatState::ECS_Unoccupied;
-	if(EquippedWeapon == nullptr)	return;
+	if (EquippedWeapon == nullptr) return;
 
 	EAmmoType AmmoType = EquippedWeapon->GetAmmoType();
-	if(AmmoMap.Contains(AmmoType))
+	if (AmmoMap.Contains(AmmoType))
 	{
 		// the ammo amount of the character equipped weapon carrying
 		int32 CarriedAmmo = AmmoMap[AmmoType];
@@ -661,7 +683,7 @@ void AShooterCharacter::FinishReloading()
 		// space left in the magazine of EquippedWeapon
 		const int32 MagEmptySpace = EquippedWeapon->GetMagazineCapacity() - EquippedWeapon->GetAmmo();
 
-		if(MagEmptySpace > CarriedAmmo)
+		if (MagEmptySpace > CarriedAmmo)
 		{
 			//reload the magazine with all the ammo we are carrying
 			EquippedWeapon->ReloadAmmo(CarriedAmmo);

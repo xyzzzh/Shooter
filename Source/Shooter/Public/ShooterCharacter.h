@@ -128,6 +128,14 @@ protected:
 	// checks to see if we have ammo of the EquippedWeapon's Ammo type
 	bool CarryAmmo();
 
+	// called from anim blueprint with Grad Clip notify 
+	UFUNCTION(BlueprintCallable)
+	void GrabClip();
+
+	// called from anim blueprint with Grad Clip notify 
+	UFUNCTION(BlueprintCallable)
+	void ReleaseClip();
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -296,6 +304,14 @@ private:
 
 	UFUNCTION(BlueprintCallable)
 	void FinishReloading();
+
+	//transform of the clip when we first grab the clip during reloading
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	FTransform ClipTransform;
+
+	//scene component to attach to the Character's hand during reloading
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	USceneComponent* HandSceneComponent;
 
 public:
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
