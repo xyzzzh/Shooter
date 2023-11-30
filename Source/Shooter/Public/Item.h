@@ -141,13 +141,25 @@ private:
 	// Initial Yaw offset between the camera and the interping item
 	float InterpInitialYawOffset;
 
+	// sound played when item picked up
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	class USoundCue* PickupSound;
+
+	// sound played when item equipped
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	USoundCue* EquipSound;
+
 public:
 	FORCEINLINE UWidgetComponent* GetPickupWidget() const { return PickupWidget; }
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
 	FORCEINLINE UBoxComponent* GetCollisionBox() const { return CollisionBox; }
 	FORCEINLINE EItemState GetItemState() const { return ItemState; }
-	void SetItemState(EItemState State);
 	FORCEINLINE USkeletalMeshComponent* GetItemMesh() const { return ItemMesh; }
+	FORCEINLINE USoundCue* GetPickupSound() const {return PickupSound;}
+	FORCEINLINE USoundCue* GetEquipSound() const {return EquipSound;}
+	
+	void SetItemState(EItemState State);
 	//called from the AShooterCharacter class
 	void StartItemCurve(AShooterCharacter* Char);
+	
 };
