@@ -15,7 +15,8 @@ UShooterAnimInstance::UShooterAnimInstance():
 	bAiming(false),
 	CharacterYaw(0.f),
 	CharacterYawLastFrame(0.f),
-	RootYawOffset(0.f)
+	RootYawOffset(0.f),
+	bReloading(false)
 {
 }
 
@@ -64,6 +65,11 @@ void UShooterAnimInstance::NativeInitializeAnimation()
 void UShooterAnimInstance::TurnInPlace()
 {
 	if (ShooterCharacter == nullptr) return;
+
+	Pitch = ShooterCharacter->GetBaseAimRotation().Pitch;
+
+	bReloading = ShooterCharacter->GetCombatState() == ECombatState::ECS_Reloading ? true : false;
+
 	if (Speed > 0)
 	{
 		//don't want to turn in place; character is moving
@@ -77,30 +83,32 @@ void UShooterAnimInstance::TurnInPlace()
 	{
 		CharacterYawLastFrame = CharacterYaw;
 		CharacterYaw = ShooterCharacter->GetActorRotation().Yaw;
-		const float YawDelta{ CharacterYaw - CharacterYawLastFrame };
+		const float YawDelta{CharacterYaw - CharacterYawLastFrame};
 
 		// Root Yaw Offset, updated and clamped to [-180, 180]
 		RootYawOffset = UKismetMathLibrary::NormalizeAxis(RootYawOffset - YawDelta);
 
 		// 1.0 if turning, 0.0 if not
-		const float Turning{ GetCurveValue(TEXT("Turning")) };
+		const float Turning{GetCurveValue(TEXT("Turning"))};
 		if (Turning > 0)
 		{
 			RotationCurveLastFrame = RotationCurve;
 			RotationCurve = GetCurveValue(TEXT("Rotation"));
-			const float DeltaRotation{ RotationCurve - RotationCurveLastFrame };
+			const float DeltaRotation{RotationCurve - RotationCurveLastFrame};
 
 			// RootYawOffset > 0, -> Turning Left. RootYawOffset < 0, -> Turning Right.
 			RootYawOffset > 0 ? RootYawOffset -= DeltaRotation : RootYawOffset += DeltaRotation;
 
-			const float ABSRootYawOffset{ FMath::Abs(RootYawOffset) };
+			const float ABSRootYawOffset{FMath::Abs(RootYawOffset)};
 			if (ABSRootYawOffset > 90.f)
 			{
-				const float YawExcess{ ABSRootYawOffset - 90.f };
+				const float YawExcess{ABSRootYawOffset - 90.f};
 				RootYawOffset > 0 ? RootYawOffset -= YawExcess : RootYawOffset += YawExcess;
 			}
 		}
 
-		if (GEngine) GEngine->AddOnScreenDebugMessage(1, -1, FColor::Cyan, FString::Printf(TEXT("RootYawOffset: %f"), RootYawOffset));
+		if (GEngine)
+			GEngine->AddOnScreenDebugMessage(1, -1, FColor::Cyan,
+			                                 FString::Printf(TEXT("RootYawOffset: %f"), RootYawOffset));
 	}
 }
