@@ -83,6 +83,9 @@ AShooterCharacter::AShooterCharacter() :
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
 	GetCharacterMovement()->JumpZVelocity = 600.0f;
 	GetCharacterMovement()->AirControl = 0.2f;
+
+	//create hand scene comp
+	HandSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("HandSceneComp"));
 }
 
 // Called when the game starts or when spawned
@@ -607,18 +610,17 @@ bool AShooterCharacter::CarryAmmo()
 void AShooterCharacter::GrabClip()
 {
 	if (EquippedWeapon == nullptr) return;
-
+	if (HandSceneComponent == nullptr) return;
 	// index for the clip bone on the equipped weapon
 	int32 ClipBoneIndex{EquippedWeapon->GetItemMesh()->GetBoneIndex(EquippedWeapon->GetClipBoneName())};
 	// store the transform of the clip
 	ClipTransform = EquippedWeapon->GetItemMesh()->GetBoneTransform(ClipBoneIndex);
 
-	FAttachmentTransformRules AttachmentRules(EAttachmentRule::KeepRelative, true);
+	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::KeepRelative, true);
 	HandSceneComponent->AttachToComponent(GetMesh(), AttachmentRules, FName(TEXT("Hand_L")));
 	HandSceneComponent->SetWorldTransform(ClipTransform);
-	
-	EquippedWeapon->SetMovingClip(true);
 
+	EquippedWeapon->SetMovingClip(true);
 }
 
 void AShooterCharacter::ReleaseClip()
@@ -671,31 +673,36 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AShooterCharacter::FinishReloading()
 {
+	// Update the Combat State
 	CombatState = ECombatState::ECS_Unoccupied;
 	if (EquippedWeapon == nullptr) return;
+	const auto AmmoType{EquippedWeapon->GetAmmoType()};
 
-	EAmmoType AmmoType = EquippedWeapon->GetAmmoType();
+	// Update the AmmoMap
 	if (AmmoMap.Contains(AmmoType))
 	{
-		// the ammo amount of the character equipped weapon carrying
+		// Amount of ammo the Character is carrying of the EquippedWeapon type
 		int32 CarriedAmmo = AmmoMap[AmmoType];
 
-		// space left in the magazine of EquippedWeapon
-		const int32 MagEmptySpace = EquippedWeapon->GetMagazineCapacity() - EquippedWeapon->GetAmmo();
+		// Space left in the magazine of EquippedWeapon
+		const int32 MagEmptySpace =
+			EquippedWeapon->GetMagazineCapacity() -
+			EquippedWeapon->GetAmmo();
 
 		if (MagEmptySpace > CarriedAmmo)
 		{
-			//reload the magazine with all the ammo we are carrying
+			// Reload the magazine with all the ammo we are carrying
 			EquippedWeapon->ReloadAmmo(CarriedAmmo);
 			CarriedAmmo = 0;
+			AmmoMap.Add(AmmoType, CarriedAmmo);
 		}
 		else
 		{
 			// fill the magazine
 			EquippedWeapon->ReloadAmmo(MagEmptySpace);
 			CarriedAmmo -= MagEmptySpace;
+			AmmoMap.Add(AmmoType, CarriedAmmo);
 		}
-		AmmoMap.Add(AmmoType, CarriedAmmo);
 	}
 }
 

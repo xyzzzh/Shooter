@@ -306,11 +306,11 @@ private:
 	void FinishReloading();
 
 	//transform of the clip when we first grab the clip during reloading
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	FTransform ClipTransform;
 
 	//scene component to attach to the Character's hand during reloading
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* HandSceneComponent;
 
 public:
@@ -322,7 +322,7 @@ public:
 	float GetCrosshairSpreadMultiplier() const;
 	FORCEINLINE int8 GetOverlappedItemCount() const { return OverlappedItemCount; }
 
-	//add/subtracts to/from OverlppedItemCount and update bShouldTracForItems
+	//add/subtracts to/from OverlappedItemCount and update bShouldTracForItems
 	void IncrementOverlappedItemCount(int8 Amount);
 
 	FVector GetCameraInterpLocation();
