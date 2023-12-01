@@ -87,10 +87,10 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Turn In Place", meta = (AllowPrivateAccess = "true"))
 	EOffsetState OffsetState;
 	// yaw of the character this frame; only updated when standing still
-	float CharacterYaw;
+	FRotator CharacterRotation;
 
 	// yaw of the character the previous frame; only updated when standing still
-	float CharacterYawLastFrame;
+	FRotator CharacterRotationLastFrame;
 
 	//yaw delta used for leaning in the running blendspace
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Lean", meta = (AllowPrivateAccess = "true"))
