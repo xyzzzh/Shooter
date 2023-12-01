@@ -90,7 +90,6 @@ DerivedDataCache/*
 /Content/Materials/*
 /Content/Meshes/*
 /Content/Sequences/*
-/Content/Textures/*
 /Content/_Game/Maps/*
 /Content/_Game/Assets/Fonts/*
 /Content/_Game/Assets/Textures/*
@@ -100,3 +99,4 @@ DerivedDataCache/*
 /Content/ModSci_Engineer/*
 /Content/ModSci_EngiProps/*
 /Content/AnimStarterPack/*
+/Content/FPS_Weapon_Bundle/*
