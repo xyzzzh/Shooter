@@ -20,6 +20,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	// override of this func so we can set AmmoMesh properties
+	virtual void SetItemProperties(EItemState State) override;
 
 private:
 	// mesh for the ammo pickup

@@ -7,33 +7,35 @@
 #include "Item.generated.h"
 
 UENUM(BlueprintType)
-enum class EItemRarity : uint8 {
-	EIR_Damaged			UMETA(DisplayName = "Damaged"),
-	EIR_Common			UMETA(DisplayName = "Common"),
-	EIR_Uncommon		UMETA(DisplayName = "Uncommon"),
-	EIR_Rare			UMETA(DisplayName = "Rare"),
-	EIR_Legendary		UMETA(DisplayName = "Legendary"),
+enum class EItemRarity : uint8
+{
+	EIR_Damaged UMETA(DisplayName = "Damaged"),
+	EIR_Common UMETA(DisplayName = "Common"),
+	EIR_Uncommon UMETA(DisplayName = "Uncommon"),
+	EIR_Rare UMETA(DisplayName = "Rare"),
+	EIR_Legendary UMETA(DisplayName = "Legendary"),
 
-	EIR_MAX				UMETA(DisplayName = "DefaultMAX")
+	EIR_MAX UMETA(DisplayName = "DefaultMAX")
 };
 
 UENUM(BlueprintType)
-enum class EItemState : uint8 {
-	EIS_Pickup			UMETA(DisplayName = "Pickup"),
-	EIS_EquipInterping	UMETA(DisplayName = "EquipInterping"),
-	EIS_PickedUp		UMETA(DisplayName = "PickedUp"),
-	EIS_Equipped		UMETA(DisplayName = "Equipped"),
-	EIS_Falling			UMETA(DisplayName = "Falling"),
+enum class EItemState : uint8
+{
+	EIS_Pickup UMETA(DisplayName = "Pickup"),
+	EIS_EquipInterping UMETA(DisplayName = "EquipInterping"),
+	EIS_PickedUp UMETA(DisplayName = "PickedUp"),
+	EIS_Equipped UMETA(DisplayName = "Equipped"),
+	EIS_Falling UMETA(DisplayName = "Falling"),
 
-	EIS_MAX				UMETA(DisplayName = "DefaultMAX")
+	EIS_MAX UMETA(DisplayName = "DefaultMAX")
 };
 
 UCLASS()
 class SHOOTER_API AItem : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AItem();
 
@@ -44,13 +46,13 @@ protected:
 	//called when overlapping area sphere
 	UFUNCTION()
 	void OnSphereOverlap(
-		UPrimitiveComponent* OverlapedComponent, 
-		AActor* OtherActor, 
+		UPrimitiveComponent* OverlapedComponent,
+		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex,
 		bool bFromSweep,
 		const FHitResult& SweepResult);
-	
+
 	//called when end overlapping area sphere
 	UFUNCTION()
 	void OnSphereEndOverlap(
@@ -63,7 +65,7 @@ protected:
 	void SetActivateStars();
 
 	// set properties of the items component based on State
-	void SetItemProperties(EItemState State);
+	virtual void SetItemProperties(EItemState State);
 
 	//called when ItemInterpTimer is finished
 	void FinishInterping();
@@ -71,7 +73,7 @@ protected:
 	//handles item interpolation when in the equipInterping state
 	void ItemInterp(float DeltaTime);
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -90,7 +92,7 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	class USphereComponent* AreaSphere;
-	
+
 	// name which appears on the pickup widget
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	FString ItemName;
@@ -114,7 +116,7 @@ private:
 	//the curve asset to use for the item's Z location when interping
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	class UCurveFloat* ItemZCurve;
-	
+
 	//starting location when interping begins
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	FVector ItemInterpStartLocation;
@@ -141,6 +143,9 @@ private:
 	// Initial Yaw offset between the camera and the interping item
 	float InterpInitialYawOffset;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	UCurveFloat* ItemScaleCurve;
+
 	// sound played when item picked up
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	class USoundCue* PickupSound;
@@ -155,11 +160,10 @@ public:
 	FORCEINLINE UBoxComponent* GetCollisionBox() const { return CollisionBox; }
 	FORCEINLINE EItemState GetItemState() const { return ItemState; }
 	FORCEINLINE USkeletalMeshComponent* GetItemMesh() const { return ItemMesh; }
-	FORCEINLINE USoundCue* GetPickupSound() const {return PickupSound;}
-	FORCEINLINE USoundCue* GetEquipSound() const {return EquipSound;}
-	
+	FORCEINLINE USoundCue* GetPickupSound() const { return PickupSound; }
+	FORCEINLINE USoundCue* GetEquipSound() const { return EquipSound; }
+
 	void SetItemState(EItemState State);
 	//called from the AShooterCharacter class
 	void StartItemCurve(AShooterCharacter* Char);
-	
 };

@@ -2,6 +2,8 @@
 
 
 #include "Item.h"
+
+#include "IDetailTreeNode.h"
 #include "Components/BoxComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Components/SphereComponent.h"
@@ -21,7 +23,7 @@ AItem::AItem() :
 	bInterping(false),
 	InterpInitialYawOffset(0.f)
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	ItemMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ItemMesh"));
@@ -43,12 +45,13 @@ AItem::AItem() :
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	//hide pickup widget
-	if (PickupWidget) {
+	if (PickupWidget)
+	{
 		PickupWidget->SetVisibility(false);
 	}
-	
+
 	SetActivateStars();
 
 	// setup overlap for areasphere
@@ -59,21 +62,27 @@ void AItem::BeginPlay()
 	SetItemProperties(ItemState);
 }
 
-void AItem::OnSphereOverlap(UPrimitiveComponent* OverlapedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AItem::OnSphereOverlap(UPrimitiveComponent* OverlapedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+                            int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor) {
-		AShooterCharacter* ShooterCharacter = Cast< AShooterCharacter>(OtherActor);
-		if (ShooterCharacter) {
+	if (OtherActor)
+	{
+		AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(OtherActor);
+		if (ShooterCharacter)
+		{
 			ShooterCharacter->IncrementOverlappedItemCount(1);
 		}
 	}
 }
 
-void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlapedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlapedComponent, AActor* OtherActor,
+                               UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (OtherActor) {
-		AShooterCharacter* ShooterCharacter = Cast< AShooterCharacter>(OtherActor);
-		if (ShooterCharacter) {
+	if (OtherActor)
+	{
+		AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(OtherActor);
+		if (ShooterCharacter)
+		{
 			ShooterCharacter->IncrementOverlappedItemCount(-1);
 		}
 	}
@@ -82,11 +91,13 @@ void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlapedComponent, AActor* 
 void AItem::SetActivateStars()
 {
 	// the 0 element isn't used
-	for (int32 i = 0; i <= 5; i++) {
+	for (int32 i = 0; i <= 5; i++)
+	{
 		ActivateStars.Add(false);
 	}
 
-	switch (ItemRarity) {
+	switch (ItemRarity)
+	{
 	case EItemRarity::EIR_Damaged:
 		ActivateStars[1] = true;
 		break;
@@ -96,7 +107,7 @@ void AItem::SetActivateStars()
 		break;
 	case EItemRarity::EIR_Uncommon:
 		ActivateStars[1] = true;
-		ActivateStars[2] = true; 
+		ActivateStars[2] = true;
 		ActivateStars[3] = true;
 		break;
 	case EItemRarity::EIR_Rare:
@@ -113,12 +124,12 @@ void AItem::SetActivateStars()
 		ActivateStars[5] = true;
 		break;
 	}
-	
 }
 
 void AItem::SetItemProperties(EItemState State)
 {
-	switch (State){
+	switch (State)
+	{
 	case EItemState::EIS_Pickup:
 		// Set mesh properties
 		ItemMesh->SetSimulatePhysics(false);
@@ -126,10 +137,10 @@ void AItem::SetItemProperties(EItemState State)
 		ItemMesh->SetVisibility(true);
 		ItemMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		// Set AreaSphere properties
+	// Set AreaSphere properties
 		AreaSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 		AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		// Set CollisionBox properties
+	// Set CollisionBox properties
 		CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		CollisionBox->SetCollisionResponseToChannel(
 			ECollisionChannel::ECC_Visibility,
@@ -138,16 +149,16 @@ void AItem::SetItemProperties(EItemState State)
 		break;
 	case EItemState::EIS_Equipped:
 		PickupWidget->SetVisibility(false);
-		// Set mesh properties
+	// Set mesh properties
 		ItemMesh->SetSimulatePhysics(false);
 		ItemMesh->SetEnableGravity(false);
 		ItemMesh->SetVisibility(true);
 		ItemMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		// Set AreaSphere properties
+	// Set AreaSphere properties
 		AreaSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		// Set CollisionBox properties
+	// Set CollisionBox properties
 		CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		break;
@@ -160,25 +171,25 @@ void AItem::SetItemProperties(EItemState State)
 		ItemMesh->SetCollisionResponseToChannel(
 			ECollisionChannel::ECC_WorldStatic,
 			ECollisionResponse::ECR_Block);
-		// Set AreaSphere properties
+	// Set AreaSphere properties
 		AreaSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		// Set CollisionBox properties
+	// Set CollisionBox properties
 		CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		break;
 	case EItemState::EIS_EquipInterping:
 		PickupWidget->SetVisibility(false);
-		// Set mesh properties
+	// Set mesh properties
 		ItemMesh->SetSimulatePhysics(false);
 		ItemMesh->SetEnableGravity(false);
 		ItemMesh->SetVisibility(true);
 		ItemMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		// Set AreaSphere properties
+	// Set AreaSphere properties
 		AreaSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		// Set CollisionBox properties
+	// Set CollisionBox properties
 		CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		break;
@@ -188,15 +199,18 @@ void AItem::SetItemProperties(EItemState State)
 void AItem::FinishInterping()
 {
 	bInterping = false;
-	if (Character) {
+	if (Character)
+	{
 		Character->GetPickupItem(this);
 	}
+	SetActorScale3D(FVector(1.f, 1.f, 1.f));
 }
 
 void AItem::ItemInterp(float DeltaTime)
 {
-	if (!bInterping)	return;
-	if (Character && ItemZCurve) {
+	if (!bInterping) return;
+	if (Character && ItemZCurve)
+	{
 		// Elapsed time since we started ItemInterpTimer
 		const float ElapsedTime = GetWorldTimerManager().GetTimerElapsed(ItemInterpTimer);
 		//Get curve value corresponding to ElapsedTime
@@ -204,14 +218,14 @@ void AItem::ItemInterp(float DeltaTime)
 		//get the item's initial location when the curve started
 		FVector ItemLocation = ItemInterpStartLocation;
 		//get location in front  of the camera
-		const FVector CameraInterpLocation{ Character->GetCameraInterpLocation() };
+		const FVector CameraInterpLocation{Character->GetCameraInterpLocation()};
 
 		//vector from Item to Camera Interp Location, X and Y are zeroed out
-		const FVector ItemToCamera{ FVector(0.f, 0.f, (CameraInterpLocation - ItemLocation).Z) };
+		const FVector ItemToCamera{FVector(0.f, 0.f, (CameraInterpLocation - ItemLocation).Z)};
 		//scale factor to multiply with CurveValue
 		const float DeltaZ = ItemToCamera.Size();
 
-		const FVector CurrentLocation = { GetActorLocation() };
+		const FVector CurrentLocation = {GetActorLocation()};
 		//Interpolated X and Y values
 		const float InterpXValue = FMath::FInterpTo(CurrentLocation.X, CameraInterpLocation.X, DeltaTime, 30.f);
 		const float InterpYValue = FMath::FInterpTo(CurrentLocation.Y, CameraInterpLocation.Y, DeltaTime, 30.f);
@@ -223,9 +237,16 @@ void AItem::ItemInterp(float DeltaTime)
 		ItemLocation.Z += CurveValue * DeltaZ;
 		SetActorLocation(ItemLocation, true, nullptr, ETeleportType::TeleportPhysics);
 
-		const FRotator CameraRotation{ Character->GetFollowCamera()->GetComponentRotation() };
-		FRotator ItemRotation{ 0.f, CameraRotation.Yaw + InterpInitialYawOffset, 0.f };
+		const FRotator CameraRotation{Character->GetFollowCamera()->GetComponentRotation()};
+		FRotator ItemRotation{0.f, CameraRotation.Yaw + InterpInitialYawOffset, 0.f};
 		SetActorRotation(ItemRotation, ETeleportType::TeleportPhysics);
+
+		if(ItemScaleCurve)
+		{
+			const float ScaleCurveValue = ItemScaleCurve->GetFloatValue(ElapsedTime);
+			SetActorScale3D(FVector(ScaleCurveValue, ScaleCurveValue, ScaleCurveValue));
+		}
+		
 	}
 }
 
@@ -258,10 +279,8 @@ void AItem::StartItemCurve(AShooterCharacter* Char)
 		&AItem::FinishInterping,
 		ZCurveTime
 	);
-	const float CameraRotationYaw{ Character->GetFollowCamera()->GetComponentRotation().Yaw };
-	const float ItemRotationYaw{ GetActorRotation().Yaw };
+	const float CameraRotationYaw{Character->GetFollowCamera()->GetComponentRotation().Yaw};
+	const float ItemRotationYaw{GetActorRotation().Yaw};
 
 	InterpInitialYawOffset = ItemRotationYaw - CameraRotationYaw;
-
 }
-
