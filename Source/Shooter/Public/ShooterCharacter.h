@@ -351,7 +351,7 @@ private:
 	// array of interp location structs
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	TArray<FInterpLocation> InterpLocations;
-	
+
 public:
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
@@ -371,4 +371,7 @@ public:
 	FORCEINLINE ECombatState GetCombatState() const { return CombatState; }
 
 	FORCEINLINE FInterpLocation GetInterpLocation(int32 Index);
+
+	int32 GetInterpLocationIndex();
+	void IncrementInterpLocItemCount(int32 Index, int32 Amount);
 };

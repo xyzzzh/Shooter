@@ -24,7 +24,8 @@ AItem::AItem() :
 	CameraTargetLocation(FVector(0.f)),
 	bInterping(false),
 	InterpInitialYawOffset(0.f),
-	ItemType(EItemType::EIT_MAX)
+	ItemType(EItemType::EIT_MAX),
+	InterpLocIndex(0)
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -204,6 +205,7 @@ void AItem::FinishInterping()
 	bInterping = false;
 	if (Character)
 	{
+		Character->IncrementInterpLocItemCount(InterpLocIndex, -1);
 		Character->GetPickupItem(this);
 	}
 	SetActorScale3D(FVector(1.f, 1.f, 1.f));
@@ -252,6 +254,24 @@ void AItem::ItemInterp(float DeltaTime)
 	}
 }
 
+FVector AItem::GetInterpLocation()
+{
+	if(Character)	return FVector(0.f);
+
+	switch (ItemType)
+	{
+	case EItemType::EIT_Ammo:
+		return Character->GetInterpLocation(InterpLocIndex).SceneComponent->GetComponentLocation();
+		break;
+
+	case EItemType::EIT_Weapon:
+		return Character->GetInterpLocation(0).SceneComponent->GetComponentLocation();
+		break;
+	}
+
+	return FVector();
+}
+
 // Called every frame
 void AItem::Tick(float DeltaTime)
 {
@@ -271,6 +291,9 @@ void AItem::StartItemCurve(AShooterCharacter* Char)
 	//store a handle to the Character
 	Character = Char;
 
+	InterpLocIndex = Character->GetInterpLocationIndex();
+	Character->IncrementInterpLocItemCount(InterpLocIndex, 1);
+	
 	if (PickupSound)
 	{
 		UGameplayStatics::PlaySound2D(this, PickupSound);

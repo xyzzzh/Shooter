@@ -683,6 +683,30 @@ void AShooterCharacter::InitializeInterpLocation()
 	InterpLocations.Add(FInterpLocation{InterpComp5, 0});
 }
 
+int32 AShooterCharacter::GetInterpLocationIndex()
+{
+	int32 LowestIndex = 1;
+	int32 LowestCount = INT_MAX;
+	for(int32 i=1;i<InterpLocations.Num();i++)
+	{
+		if(InterpLocations[i].ItemCount < LowestCount)
+		{
+			LowestIndex = i;
+			LowestCount = InterpLocations[i].ItemCount;
+		}
+	}
+	return LowestIndex;
+}
+
+void AShooterCharacter::IncrementInterpLocItemCount(int32 Index, int32 Amount)
+{
+	if(Amount < -1 || Amount > 1)	return;
+	if(InterpLocations.Num() >= Index)
+	{
+		InterpLocations[Index].ItemCount += Amount;
+	}
+}
+
 // Called every frame
 void AShooterCharacter::Tick(float DeltaTime)
 {
@@ -779,6 +803,7 @@ void AShooterCharacter::IncrementOverlappedItemCount(int8 Amount)
 		bShouldTracForItems = true;
 	}
 }
+
 
 FVector AShooterCharacter::GetCameraInterpLocation()
 {
