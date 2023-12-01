@@ -7,6 +7,7 @@
 #include "Shooter/AmmoType.h"
 #include "ShooterCharacter.generated.h"
 
+class AAmmo;
 class UCameraComponent;
 class USpringArmComponent;
 class USoundCue;
@@ -135,6 +136,8 @@ protected:
 	// called from anim blueprint with Grad Clip notify 
 	UFUNCTION(BlueprintCallable)
 	void ReleaseClip();
+
+	void PickupAmmo(AAmmo* Ammo);
 
 public:
 	// Called every frame

@@ -67,3 +67,4 @@ void AAmmo::SetItemProperties(EItemState State)
 		break;
 	}
 }
+

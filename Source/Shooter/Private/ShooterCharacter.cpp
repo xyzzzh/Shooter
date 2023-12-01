@@ -3,6 +3,7 @@
 
 #include "ShooterCharacter.h"
 
+#include "Ammo.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -487,7 +488,7 @@ void AShooterCharacter::SelectButtonPressed()
 	{
 		TraceHitItem->StartItemCurve(this);
 
-		if(TraceHitItem->GetPickupSound())
+		if (TraceHitItem->GetPickupSound())
 		{
 			UGameplayStatics::PlaySound2D(this, TraceHitItem->GetPickupSound());
 		}
@@ -633,6 +634,27 @@ void AShooterCharacter::ReleaseClip()
 	EquippedWeapon->SetMovingClip(false);
 }
 
+void AShooterCharacter::PickupAmmo(AAmmo* Ammo)
+{
+	const EAmmoType Type = Ammo->GetAmmoType();
+	if (AmmoMap.Find(Type))
+	{
+		int32 AmmoCount{AmmoMap[Type]};
+		AmmoCount+=Ammo->GetItemCount();
+		AmmoMap[Type] = AmmoCount;
+	}
+
+	if(EquippedWeapon->GetAmmoType() == Type)
+	{
+		if(EquippedWeapon->GetAmmo() == 0)
+		{
+			ReloadWeapon();
+		}
+	}
+
+	Ammo->Destroy();
+}
+
 // Called every frame
 void AShooterCharacter::Tick(float DeltaTime)
 {
@@ -739,13 +761,20 @@ FVector AShooterCharacter::GetCameraInterpLocation()
 
 void AShooterCharacter::GetPickupItem(AItem* Item)
 {
-	if(Item->GetEquipSound())
+	if (Item->GetEquipSound())
 	{
 		UGameplayStatics::PlaySound2D(this, Item->GetEquipSound());
 	}
+
 	auto Weapon = Cast<AWeapon>(Item);
 	if (Weapon)
 	{
 		SwapWeapon(Weapon);
+	}
+
+	auto Ammo = Cast<AAmmo>(Item);
+	if (Ammo)
+	{
+		PickupAmmo(Ammo);
 	}
 }
