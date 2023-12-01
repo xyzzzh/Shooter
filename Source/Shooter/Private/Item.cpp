@@ -23,7 +23,8 @@ AItem::AItem() :
 	ItemInterpStartLocation(FVector(0.f)),
 	CameraTargetLocation(FVector(0.f)),
 	bInterping(false),
-	InterpInitialYawOffset(0.f)
+	InterpInitialYawOffset(0.f),
+	ItemType(EItemType::EIT_MAX)
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -243,12 +244,11 @@ void AItem::ItemInterp(float DeltaTime)
 		FRotator ItemRotation{0.f, CameraRotation.Yaw + InterpInitialYawOffset, 0.f};
 		SetActorRotation(ItemRotation, ETeleportType::TeleportPhysics);
 
-		if(ItemScaleCurve)
+		if (ItemScaleCurve)
 		{
 			const float ScaleCurveValue = ItemScaleCurve->GetFloatValue(ElapsedTime);
 			SetActorScale3D(FVector(ScaleCurveValue, ScaleCurveValue, ScaleCurveValue));
 		}
-		
 	}
 }
 
@@ -271,11 +271,11 @@ void AItem::StartItemCurve(AShooterCharacter* Char)
 	//store a handle to the Character
 	Character = Char;
 
-	if(PickupSound)
+	if (PickupSound)
 	{
 		UGameplayStatics::PlaySound2D(this, PickupSound);
 	}
-	
+
 	//store initial location of the item
 	ItemInterpStartLocation = GetActorLocation();
 	bInterping = true;

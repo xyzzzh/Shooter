@@ -25,6 +25,18 @@ enum class ECombatState : uint8
 	ECS_MAX UMETA(DisplayName = "DefaultMAX")
 };
 
+USTRUCT(BlueprintType)
+struct FInterpLocation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	USceneComponent* SceneComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int32 ItemCount;
+};
+
 UCLASS()
 class SHOOTER_API AShooterCharacter : public ACharacter
 {
@@ -138,6 +150,8 @@ protected:
 	void ReleaseClip();
 
 	void PickupAmmo(AAmmo* Ammo);
+
+	void InitializeInterpLocation();
 
 public:
 	// Called every frame
@@ -333,6 +347,10 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* InterpComp5;
+
+	// array of interp location structs
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	TArray<FInterpLocation> InterpLocations;
 	
 public:
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -351,4 +369,6 @@ public:
 	void GetPickupItem(AItem* Item);
 
 	FORCEINLINE ECombatState GetCombatState() const { return CombatState; }
+
+	FORCEINLINE FInterpLocation GetInterpLocation(int32 Index);
 };

@@ -121,6 +121,8 @@ void AShooterCharacter::BeginPlay()
 	EquipWeapon(SpawnDefaultWeapon());
 
 	InitializeAmmoMap();
+
+	InitializeInterpLocation();
 }
 
 void AShooterCharacter::MoveForward(float Value)
@@ -670,6 +672,17 @@ void AShooterCharacter::PickupAmmo(AAmmo* Ammo)
 	Ammo->Destroy();
 }
 
+void AShooterCharacter::InitializeInterpLocation()
+{
+	InterpLocations.Add(FInterpLocation{WeaponInterpComp, 0});
+
+	InterpLocations.Add(FInterpLocation{InterpComp1, 0});
+	InterpLocations.Add(FInterpLocation{InterpComp2, 0});
+	InterpLocations.Add(FInterpLocation{InterpComp3, 0});
+	InterpLocations.Add(FInterpLocation{InterpComp4, 0});
+	InterpLocations.Add(FInterpLocation{InterpComp5, 0});
+}
+
 // Called every frame
 void AShooterCharacter::Tick(float DeltaTime)
 {
@@ -792,4 +805,13 @@ void AShooterCharacter::GetPickupItem(AItem* Item)
 	{
 		PickupAmmo(Ammo);
 	}
+}
+
+FInterpLocation AShooterCharacter::GetInterpLocation(int32 Index)
+{
+	if(Index <= InterpLocations.Num())
+	{
+		return InterpLocations[Index];
+	}
+	return FInterpLocation();
 }
