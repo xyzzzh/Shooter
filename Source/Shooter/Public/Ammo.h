@@ -24,6 +24,16 @@ protected:
 	// override of this func so we can set AmmoMesh properties
 	virtual void SetItemProperties(EItemState State) override;
 
+	//called when overlapping area sphere
+	UFUNCTION()
+	void AmmoSphereOverlap(
+		UPrimitiveComponent* OverlapedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
+
 private:
 	// mesh for the ammo pickup
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ammo, meta = (AllowPrivateAccess = "true"))
@@ -35,6 +45,10 @@ private:
 	// texture for ammo icon
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ammo, meta = (AllowPrivateAccess = "true"))
 	UTexture2D* AmmoIconTexture;
+
+	// overlap sphere for picking up the ammo
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ammo, meta = (AllowPrivateAccess = "true"))
+	USphereComponent* AmmoCollisionSphere;
 
 public:
 	FORCEINLINE UStaticMeshComponent* GetAmmoMesh() const { return AmmoMesh; }
