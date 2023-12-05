@@ -290,6 +290,15 @@ void AItem::InitializeCustomDepth()
 	DisableCustomDepth();
 }
 
+void AItem::OnConstruction(const FTransform& Transform)
+{
+	if(MaterialInstance)
+	{
+		DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInstance, this);
+		ItemMesh->SetMaterial(MaterialIndex, DynamicMaterialInstance);
+	}
+}
+
 // Called every frame
 void AItem::Tick(float DeltaTime)
 {
