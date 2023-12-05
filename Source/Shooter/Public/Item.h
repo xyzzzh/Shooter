@@ -92,6 +92,7 @@ protected:
 
 	void EnableGlowMaterial();
 	void DisableGlowMaterial();
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -190,6 +191,9 @@ private:
 	// material instance used with the dynamic material instance
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	UMaterialInstance* MaterialInstance;
+
+
+	bool bCanChangeCustomDepth;
 
 public:
 	FORCEINLINE UWidgetComponent* GetPickupWidget() const { return PickupWidget; }
