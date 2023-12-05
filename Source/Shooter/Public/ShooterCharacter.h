@@ -271,7 +271,7 @@ private:
 	FTimerHandle AutoFireTimer;
 
 	//true if we should trace every frame for items
-	bool bShouldTracForItems;
+	bool bShouldTraceForItems;
 
 	//count of overlapped AItems
 	int8 OverlappedItemCount;

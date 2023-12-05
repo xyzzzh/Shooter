@@ -86,6 +86,9 @@ protected:
 
 	FVector GetInterpLocation();
 
+
+	void InitializeCustomDepth();
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -173,6 +176,8 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	int32 InterpLocIndex;
 
+	int32 MaterialIndex;
+
 public:
 	FORCEINLINE UWidgetComponent* GetPickupWidget() const { return PickupWidget; }
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
@@ -186,4 +191,6 @@ public:
 	void SetItemState(EItemState State);
 	//called from the AShooterCharacter class
 	void StartItemCurve(AShooterCharacter* Char);
+	virtual void EnableCustomDepth();
+	virtual void DisableCustomDepth();
 };

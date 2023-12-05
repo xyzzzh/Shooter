@@ -25,7 +25,8 @@ AItem::AItem() :
 	bInterping(false),
 	InterpInitialYawOffset(0.f),
 	ItemType(EItemType::EIT_MAX),
-	InterpLocIndex(0)
+	InterpLocIndex(0),
+	MaterialIndex(0)
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -64,6 +65,8 @@ void AItem::BeginPlay()
 
 	//set item properties
 	SetItemProperties(ItemState);
+
+	InitializeCustomDepth();
 }
 
 void AItem::OnSphereOverlap(UPrimitiveComponent* OverlapedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -256,7 +259,7 @@ void AItem::ItemInterp(float DeltaTime)
 
 FVector AItem::GetInterpLocation()
 {
-	if(Character)	return FVector(0.f);
+	if (Character) return FVector(0.f);
 
 	switch (ItemType)
 	{
@@ -270,6 +273,21 @@ FVector AItem::GetInterpLocation()
 	}
 
 	return FVector();
+}
+
+void AItem::EnableCustomDepth()
+{
+	ItemMesh->SetRenderCustomDepth(true);
+}
+
+void AItem::DisableCustomDepth()
+{
+	ItemMesh->SetRenderCustomDepth(false);
+}
+
+void AItem::InitializeCustomDepth()
+{
+	DisableCustomDepth();
 }
 
 // Called every frame
@@ -293,7 +311,7 @@ void AItem::StartItemCurve(AShooterCharacter* Char)
 
 	InterpLocIndex = Character->GetInterpLocationIndex();
 	Character->IncrementInterpLocItemCount(InterpLocIndex, 1);
-	
+
 	if (PickupSound)
 	{
 		UGameplayStatics::PlaySound2D(this, PickupSound);

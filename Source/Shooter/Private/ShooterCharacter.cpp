@@ -53,7 +53,7 @@ AShooterCharacter::AShooterCharacter() :
 	AutomaticFireRate(0.1f),
 	bShouldFire(true),
 	bFireButtonPressed(false),
-	bShouldTracForItems(false),
+	bShouldTraceForItems(false),
 	//camera interp location var
 	CameraInterpDistance(250.f),
 	CameraInterpElevation(65.f),
@@ -428,7 +428,7 @@ bool AShooterCharacter::TraceUnderCrosshairs(FHitResult& OutHitResult, FVector& 
 
 void AShooterCharacter::TraceForItems()
 {
-	if (bShouldTracForItems)
+	if (bShouldTraceForItems)
 	{
 		FHitResult ItemTraceResult;
 		FVector HitLocation;
@@ -438,29 +438,32 @@ void AShooterCharacter::TraceForItems()
 			TraceHitItem = Cast<AItem>(ItemTraceResult.Actor);
 			if (TraceHitItem && TraceHitItem->GetPickupWidget())
 			{
-				//show item's pickup widget
+				// Show Item's Pickup Widget
 				TraceHitItem->GetPickupWidget()->SetVisibility(true);
+				TraceHitItem->EnableCustomDepth();
 			}
 
+			// We hit an AItem last frame
 			if (TraceHitItemLastFrame)
 			{
 				if (TraceHitItem != TraceHitItemLastFrame)
 				{
-					// we are hitting a different AItem this frame from last frame
-					// or AItem is null
+					// We are hitting a different AItem this frame from last frame
+					// Or AItem is null.
 					TraceHitItemLastFrame->GetPickupWidget()->SetVisibility(false);
+					TraceHitItemLastFrame->DisableCustomDepth();
 				}
 			}
-
-			// store a reference tp HitItem for next frame
+			// Store a reference to HitItem for next frame
 			TraceHitItemLastFrame = TraceHitItem;
 		}
 	}
 	else if (TraceHitItemLastFrame)
 	{
-		// no longer overlapped any items,
-		//item last frame should not show
+		// No longer overlapping any items,
+		// Item last frame should not show widget
 		TraceHitItemLastFrame->GetPickupWidget()->SetVisibility(false);
+		TraceHitItemLastFrame->DisableCustomDepth();
 	}
 }
 
@@ -795,12 +798,12 @@ void AShooterCharacter::IncrementOverlappedItemCount(int8 Amount)
 	if (OverlappedItemCount + Amount <= 0)
 	{
 		OverlappedItemCount = 0;
-		bShouldTracForItems = false;
+		bShouldTraceForItems = false;
 	}
 	else
 	{
 		OverlappedItemCount += Amount;
-		bShouldTracForItems = true;
+		bShouldTraceForItems = true;
 	}
 }
 
