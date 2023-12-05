@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Item.generated.h"
 
+class UCurveVector;
+
 UENUM(BlueprintType)
 enum class EItemRarity : uint8
 {
@@ -90,9 +92,10 @@ protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	void EnableGlowMaterial();
-	void DisableGlowMaterial();
+	void UpdatePulse();
 
+	void ResetPulseTimer();
+	void StartPulseTimer();
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -195,6 +198,27 @@ private:
 
 	bool bCanChangeCustomDepth;
 
+	// curve to drive the dynamic material paraters
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	UCurveVector* PulseCurve;
+
+	FTimerHandle PulseTimer;
+
+	// time for the PulseTimer
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	float PulseCurveTime;
+
+	UPROPERTY(VisibleAnywhere, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	float GlowAmount;
+
+	UPROPERTY(VisibleAnywhere, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	float FresnelExponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	float FresnelReflectionFraction;
+
+	
+
 public:
 	FORCEINLINE UWidgetComponent* GetPickupWidget() const { return PickupWidget; }
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
@@ -210,4 +234,6 @@ public:
 	void StartItemCurve(AShooterCharacter* Char);
 	virtual void EnableCustomDepth();
 	virtual void DisableCustomDepth();
+	void EnableGlowMaterial();
+	void DisableGlowMaterial();
 };
