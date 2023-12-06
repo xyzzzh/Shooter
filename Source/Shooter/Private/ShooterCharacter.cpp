@@ -120,6 +120,7 @@ void AShooterCharacter::BeginPlay()
 	//spawn the default weapon and attach it to the mesh
 	EquipWeapon(SpawnDefaultWeapon());
 	Inventory.Add(EquippedWeapon);
+	EquippedWeapon->SetSlotIndex(0);
 	EquippedWeapon->DisableCustomDepth();
 	EquippedWeapon->DisableGlowMaterial();
 	
@@ -526,6 +527,8 @@ void AShooterCharacter::SwapWeapon(AWeapon* WeaponToSwap)
 {
 	DropWeapon();
 	EquipWeapon(WeaponToSwap);
+	TraceHitItem = nullptr;
+	TraceHitItemLastFrame = nullptr;
 }
 
 void AShooterCharacter::InitializeAmmoMap()
@@ -830,7 +833,9 @@ void AShooterCharacter::GetPickupItem(AItem* Item)
 	{
 		if(Inventory.Num() < INVENTORY_CAPACITY)
 		{
+			Weapon->SetSlotIndex(Inventory.Num());
 			Inventory.Add(Weapon);
+			Weapon->SetItemState(EItemState::EIS_PickedUp);
 		}
 		else
 		{

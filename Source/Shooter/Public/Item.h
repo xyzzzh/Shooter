@@ -96,6 +96,7 @@ protected:
 
 	void ResetPulseTimer();
 	void StartPulseTimer();
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -232,6 +233,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	UTexture2D* AmmoItem;
 
+	// slot in the inventory array
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	int32 SlotIndex;
+
 public:
 	FORCEINLINE UWidgetComponent* GetPickupWidget() const { return PickupWidget; }
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
@@ -241,6 +246,9 @@ public:
 	FORCEINLINE USoundCue* GetPickupSound() const { return PickupSound; }
 	FORCEINLINE USoundCue* GetEquipSound() const { return EquipSound; }
 	FORCEINLINE int32 GetItemCount() const { return ItemCount; }
+	FORCEINLINE int32 GetSlotIndex() const { return SlotIndex; }
+	FORCEINLINE void SetSlotIndex(int32 Index) { SlotIndex = Index; }
+
 
 	void SetItemState(EItemState State);
 	//called from the AShooterCharacter class
