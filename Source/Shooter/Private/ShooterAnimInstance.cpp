@@ -6,7 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
-UShooterAnimInstance::UShooterAnimInstance():
+UShooterAnimInstance::UShooterAnimInstance() :
 	Speed(0.f),
 	bIsInAir(false),
 	bIsAccerlerating(false),
@@ -20,7 +20,8 @@ UShooterAnimInstance::UShooterAnimInstance():
 	YawDelta(0.f),
 	RootYawOffset(0.f),
 	bReloading(false),
-	OffsetState(EOffsetState::EOS_Hip)
+	OffsetState(EOffsetState::EOS_Hip),
+	bEquipping(false)
 {
 }
 
@@ -33,6 +34,8 @@ void UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
 	if (ShooterCharacter)
 	{
 		bReloading = ShooterCharacter->GetCombatState() == ECombatState::ECS_Reloading;
+		bEquipping = ShooterCharacter->GetCombatState() == ECombatState::ECS_Equipping;
+		
 		FVector Velocity{ShooterCharacter->GetVelocity()};
 		Velocity.Z = 0.0f;
 		Speed = Velocity.Size();
@@ -127,7 +130,6 @@ void UShooterAnimInstance::TurnInPlace()
 				RootYawOffset > 0 ? RootYawOffset -= YawExcess : RootYawOffset += YawExcess;
 			}
 		}
-		
 	}
 }
 

@@ -95,4 +95,8 @@ private:
 	//yaw delta used for leaning in the running blendspace
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Lean", meta = (AllowPrivateAccess = "true"))
 	float YawDelta;
+
+	// true when equipping
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Equip", meta = (AllowPrivateAccess = "true"))
+	bool bEquipping;
 };
