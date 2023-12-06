@@ -123,7 +123,7 @@ void AShooterCharacter::BeginPlay()
 	EquippedWeapon->SetSlotIndex(0);
 	EquippedWeapon->DisableCustomDepth();
 	EquippedWeapon->DisableGlowMaterial();
-	
+
 	InitializeAmmoMap();
 
 	InitializeInterpLocation();
@@ -440,6 +440,12 @@ void AShooterCharacter::TraceForItems()
 		if (ItemTraceResult.bBlockingHit)
 		{
 			TraceHitItem = Cast<AItem>(ItemTraceResult.Actor);
+			if (TraceHitItem && TraceHitItem->GetItemState()==EItemState::EIS_EquipInterping)
+			{
+				TraceHitItem = nullptr;
+			}
+
+			
 			if (TraceHitItem && TraceHitItem->GetPickupWidget())
 			{
 				// Show Item's Pickup Widget
@@ -493,7 +499,7 @@ void AShooterCharacter::EquipWeapon(AWeapon* WeaponToEquip)
 			HandSocket->AttachActor(WeaponToEquip, GetMesh());
 		}
 
-		if(EquippedWeapon == nullptr)
+		if (EquippedWeapon == nullptr)
 		{
 			// -1 = no EquippedWeapon
 			EquipItemDelegate.Broadcast(-1, WeaponToEquip->GetSlotIndex());
@@ -502,7 +508,7 @@ void AShooterCharacter::EquipWeapon(AWeapon* WeaponToEquip)
 		{
 			EquipItemDelegate.Broadcast(EquippedWeapon->GetSlotIndex(), WeaponToEquip->GetSlotIndex());
 		}
-		
+
 		// set EquippedWeapon to the newly spawn Weapon
 		EquippedWeapon = WeaponToEquip;
 		EquippedWeapon->SetItemState(EItemState::EIS_Equipped);
@@ -525,8 +531,7 @@ void AShooterCharacter::SelectButtonPressed()
 	if (TraceHitItem)
 	{
 		TraceHitItem->StartItemCurve(this);
-
-		
+		TraceHitItem = nullptr;
 	}
 }
 
@@ -536,12 +541,12 @@ void AShooterCharacter::SelectButtonReleased()
 
 void AShooterCharacter::SwapWeapon(AWeapon* WeaponToSwap)
 {
-
-	if(Inventory.Num()-1 >= EquippedWeapon->GetSlotIndex())
+	if (Inventory.Num() - 1 >= EquippedWeapon->GetSlotIndex())
 	{
 		Inventory[EquippedWeapon->GetSlotIndex()] = WeaponToSwap;
+		WeaponToSwap->SetSlotIndex(EquippedWeapon->GetSlotIndex());
 	}
-	
+
 	DropWeapon();
 	EquipWeapon(WeaponToSwap);
 	TraceHitItem = nullptr;
@@ -683,13 +688,13 @@ void AShooterCharacter::PickupAmmo(AAmmo* Ammo)
 	if (AmmoMap.Find(Type))
 	{
 		int32 AmmoCount{AmmoMap[Type]};
-		AmmoCount+=Ammo->GetItemCount();
+		AmmoCount += Ammo->GetItemCount();
 		AmmoMap[Type] = AmmoCount;
 	}
 
-	if(EquippedWeapon->GetAmmoType() == Type)
+	if (EquippedWeapon->GetAmmoType() == Type)
 	{
-		if(EquippedWeapon->GetAmmo() == 0)
+		if (EquippedWeapon->GetAmmo() == 0)
 		{
 			ReloadWeapon();
 		}
@@ -711,58 +716,58 @@ void AShooterCharacter::InitializeInterpLocation()
 
 void AShooterCharacter::FKeyPressed()
 {
-	if(EquippedWeapon->GetSlotIndex() == 0)	return;
+	if (EquippedWeapon->GetSlotIndex() == 0) return;
 	ExchangeInventoryItems(EquippedWeapon->GetSlotIndex(), 0);
 }
 
 void AShooterCharacter::OneKeyPressed()
 {
-	if(EquippedWeapon->GetSlotIndex() == 1)	return;
+	if (EquippedWeapon->GetSlotIndex() == 1) return;
 	ExchangeInventoryItems(EquippedWeapon->GetSlotIndex(), 1);
 }
 
 void AShooterCharacter::TwoKeyPressed()
 {
-	if(EquippedWeapon->GetSlotIndex() == 2)	return;
+	if (EquippedWeapon->GetSlotIndex() == 2) return;
 	ExchangeInventoryItems(EquippedWeapon->GetSlotIndex(), 2);
 }
 
 void AShooterCharacter::ThreeKeyPressed()
 {
-	if(EquippedWeapon->GetSlotIndex() == 3)	return;
+	if (EquippedWeapon->GetSlotIndex() == 3) return;
 	ExchangeInventoryItems(EquippedWeapon->GetSlotIndex(), 3);
 }
 
 void AShooterCharacter::FourKeyPressed()
 {
-	if(EquippedWeapon->GetSlotIndex() == 4)	return;
+	if (EquippedWeapon->GetSlotIndex() == 4) return;
 	ExchangeInventoryItems(EquippedWeapon->GetSlotIndex(), 4);
 }
 
 void AShooterCharacter::FiveKeyPressed()
 {
-	if(EquippedWeapon->GetSlotIndex() == 5)	return;
+	if (EquippedWeapon->GetSlotIndex() == 5) return;
 	ExchangeInventoryItems(EquippedWeapon->GetSlotIndex(), 5);
 }
 
 void AShooterCharacter::ExchangeInventoryItems(int32 CurrentItemIndex, int32 NewItemIndex)
 {
-	if((CurrentItemIndex == NewItemIndex) && (NewItemIndex >= Inventory.Num()))	return;
+	if ((CurrentItemIndex == NewItemIndex) || (NewItemIndex >= Inventory.Num())) return;
 	auto OldEquippedWeapon = EquippedWeapon;
 	auto NewWeapon = Cast<AWeapon>(Inventory[NewItemIndex]);
 	EquipWeapon(NewWeapon);
 
 	OldEquippedWeapon->SetItemState(EItemState::EIS_PickedUp);
-	NewWeapon->SetItemState(EItemState::EIS_Equipped);	
+	NewWeapon->SetItemState(EItemState::EIS_Equipped);
 }
 
 int32 AShooterCharacter::GetInterpLocationIndex()
 {
 	int32 LowestIndex = 1;
 	int32 LowestCount = INT_MAX;
-	for(int32 i=1;i<InterpLocations.Num();i++)
+	for (int32 i = 1; i < InterpLocations.Num(); i++)
 	{
-		if(InterpLocations[i].ItemCount < LowestCount)
+		if (InterpLocations[i].ItemCount < LowestCount)
 		{
 			LowestIndex = i;
 			LowestCount = InterpLocations[i].ItemCount;
@@ -773,8 +778,8 @@ int32 AShooterCharacter::GetInterpLocationIndex()
 
 void AShooterCharacter::IncrementInterpLocItemCount(int32 Index, int32 Amount)
 {
-	if(Amount < -1 || Amount > 1)	return;
-	if(InterpLocations.Num() >= Index)
+	if (Amount < -1 || Amount > 1) return;
+	if (InterpLocations.Num() >= Index)
 	{
 		InterpLocations[Index].ItemCount += Amount;
 	}
@@ -902,7 +907,7 @@ void AShooterCharacter::GetPickupItem(AItem* Item)
 	auto Weapon = Cast<AWeapon>(Item);
 	if (Weapon)
 	{
-		if(Inventory.Num() < INVENTORY_CAPACITY)
+		if (Inventory.Num() < INVENTORY_CAPACITY)
 		{
 			Weapon->SetSlotIndex(Inventory.Num());
 			Inventory.Add(Weapon);
@@ -923,7 +928,7 @@ void AShooterCharacter::GetPickupItem(AItem* Item)
 
 FInterpLocation AShooterCharacter::GetInterpLocation(int32 Index)
 {
-	if(Index <= InterpLocations.Num())
+	if (Index <= InterpLocations.Num())
 	{
 		return InterpLocations[Index];
 	}
