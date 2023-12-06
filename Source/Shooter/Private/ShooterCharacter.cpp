@@ -119,6 +119,7 @@ void AShooterCharacter::BeginPlay()
 	}
 	//spawn the default weapon and attach it to the mesh
 	EquipWeapon(SpawnDefaultWeapon());
+	Inventory.Add(EquippedWeapon);
 	EquippedWeapon->DisableCustomDepth();
 	EquippedWeapon->DisableGlowMaterial();
 	
@@ -827,7 +828,14 @@ void AShooterCharacter::GetPickupItem(AItem* Item)
 	auto Weapon = Cast<AWeapon>(Item);
 	if (Weapon)
 	{
-		SwapWeapon(Weapon);
+		if(Inventory.Num() < INVENTORY_CAPACITY)
+		{
+			Inventory.Add(Weapon);
+		}
+		else
+		{
+			SwapWeapon(Weapon);
+		}
 	}
 
 	auto Ammo = Cast<AAmmo>(Item);
