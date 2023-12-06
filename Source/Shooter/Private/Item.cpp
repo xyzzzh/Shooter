@@ -402,6 +402,23 @@ void AItem::Tick(float DeltaTime)
 	UpdatePulse();
 }
 
+void AItem::PlayEquipSound(bool bForcePlaySound)
+{
+	if (EquipSound)
+	{
+		UGameplayStatics::PlaySound2D(this, EquipSound);
+	}
+}
+
+
+void AItem::PlayPickupSound()
+{
+	if (PickupSound)
+	{
+		UGameplayStatics::PlaySound2D(this, PickupSound);
+	}
+}
+
 void AItem::ResetPulseTimer()
 {
 	StartPulseTimer();
@@ -429,10 +446,7 @@ void AItem::StartItemCurve(AShooterCharacter* Char)
 	InterpLocIndex = Character->GetInterpLocationIndex();
 	Character->IncrementInterpLocItemCount(InterpLocIndex, 1);
 
-	if (PickupSound)
-	{
-		UGameplayStatics::PlaySound2D(this, PickupSound);
-	}
+	PlayPickupSound();
 
 	//store initial location of the item
 	ItemInterpStartLocation = GetActorLocation();
