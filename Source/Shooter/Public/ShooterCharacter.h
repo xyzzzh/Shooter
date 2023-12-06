@@ -164,6 +164,7 @@ protected:
 	void FiveKeyPressed();
 
 	void ExchangeInventoryItems(int32 CurrentItemIndex, int32 NewItemIndex);
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -333,13 +334,13 @@ private:
 	/* Montage for equip animation */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* EquipMontage;
-	
+
 	UFUNCTION(BlueprintCallable)
 	void FinishReloading();
 
 	UFUNCTION(BlueprintCallable)
 	void FinishEquipping();
-	
+
 	//transform of the clip when we first grab the clip during reloading
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	FTransform ClipTransform;
@@ -370,6 +371,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	TArray<FInterpLocation> InterpLocations;
 
+	bool bShouldPlayPickupSound;
+	bool bShouldPlayEquipSound;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory, meta = (AllowPrivateAccess = "true"))
 	TArray<AItem*> Inventory;
 
@@ -398,6 +402,8 @@ public:
 	FORCEINLINE ECombatState GetCombatState() const { return CombatState; }
 
 	FORCEINLINE FInterpLocation GetInterpLocation(int32 Index);
+	FORCEINLINE bool ShouldPlayPickupSound() const { return bShouldPlayPickupSound; }
+	FORCEINLINE bool ShouldPlayEquipSound() const { return bShouldPlayEquipSound; }
 
 	int32 GetInterpLocationIndex();
 	void IncrementInterpLocItemCount(int32 Index, int32 Amount);

@@ -123,7 +123,8 @@ void AShooterCharacter::BeginPlay()
 	EquippedWeapon->SetSlotIndex(0);
 	EquippedWeapon->DisableCustomDepth();
 	EquippedWeapon->DisableGlowMaterial();
-
+	EquippedWeapon->SetCharacter(this);
+	
 	InitializeAmmoMap();
 
 	InitializeInterpLocation();
@@ -769,6 +770,7 @@ void AShooterCharacter::ExchangeInventoryItems(int32 CurrentItemIndex, int32 New
 		AnimInstance->Montage_Play(EquipMontage, 1.f);
 		AnimInstance->Montage_JumpToSection(FName("Equip"));
 	}
+	NewWeapon->PlayEquipSound(true);
 }
 
 int32 AShooterCharacter::GetInterpLocationIndex()
