@@ -114,7 +114,7 @@ protected:
 	class AWeapon* SpawnDefaultWeapon();
 
 	//takes a weapon and attach it to the mesh
-	void EquipWeapon(AWeapon* WeaponToEquip, bool bSwapping=false);
+	void EquipWeapon(AWeapon* WeaponToEquip, bool bSwapping = false);
 
 	//detach weapon and let it fall to the ground
 	void DropWeapon();
@@ -404,6 +404,7 @@ public:
 	FORCEINLINE FInterpLocation GetInterpLocation(int32 Index);
 	FORCEINLINE bool ShouldPlayPickupSound() const { return bShouldPlayPickupSound; }
 	FORCEINLINE bool ShouldPlayEquipSound() const { return bShouldPlayEquipSound; }
+	FORCEINLINE AWeapon* GetEquippedWeapon() const { return EquippedWeapon; }
 
 	int32 GetInterpLocationIndex();
 	void IncrementInterpLocItemCount(int32 Index, int32 Amount);

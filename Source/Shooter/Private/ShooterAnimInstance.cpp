@@ -3,6 +3,7 @@
 
 #include "ShooterAnimInstance.h"
 #include "ShooterCharacter.h"
+#include "Weapon.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -21,7 +22,9 @@ UShooterAnimInstance::UShooterAnimInstance() :
 	RootYawOffset(0.f),
 	bReloading(false),
 	OffsetState(EOffsetState::EOS_Hip),
-	bEquipping(false)
+	bEquipping(false),
+	EquippedWeaponType(EWeaponType::EWT_MAX),
+	bShouldUseFABRIK(false)
 {
 }
 
@@ -35,7 +38,8 @@ void UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
 	{
 		bReloading = ShooterCharacter->GetCombatState() == ECombatState::ECS_Reloading;
 		bEquipping = ShooterCharacter->GetCombatState() == ECombatState::ECS_Equipping;
-		
+		bShouldUseFABRIK = ShooterCharacter->GetCombatState() == ECombatState::ECS_Unoccupied || ShooterCharacter->
+			GetCombatState() == ECombatState::ECS_FireTimerInProgress;
 		FVector Velocity{ShooterCharacter->GetVelocity()};
 		Velocity.Z = 0.0f;
 		Speed = Velocity.Size();
@@ -77,6 +81,11 @@ void UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
 		else
 		{
 			OffsetState = EOffsetState::EOS_Hip;
+		}
+		// check if ShooterCharacter has a valid EquippedWeapon
+		if (ShooterCharacter->GetEquippedWeapon())
+		{
+			EquippedWeaponType = ShooterCharacter->GetEquippedWeapon()->GetWeaponType();
 		}
 	}
 	TurnInPlace();
