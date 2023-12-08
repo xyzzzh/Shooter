@@ -211,12 +211,6 @@ private:
 		meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
 	float MouseAimingLookUpRate;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
-	USoundCue* FireSound;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
-	UParticleSystem* MuzzleFlash;
-
 	/* Montage for firing weapon */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* HipFireMontage;
@@ -275,9 +269,6 @@ private:
 
 	//true when we can fire. false when waiting for the timer
 	bool bShouldFire;
-
-	//rate of automatic gun fire
-	float AutomaticFireRate;
 
 	//sets a timer between gunshots
 	FTimerHandle AutoFireTimer;
