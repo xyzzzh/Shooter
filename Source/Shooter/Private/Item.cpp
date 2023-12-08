@@ -368,13 +368,6 @@ void AItem::OnConstruction(const FTransform& Transform)
 		}
 	}
 	
-	if (MaterialInstance)
-	{
-		DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInstance, this);
-		DynamicMaterialInstance->SetVectorParameterValue(TEXT("FresnelColor"), GlowColor);
-		ItemMesh->SetMaterial(MaterialIndex, DynamicMaterialInstance);
-		EnableGlowMaterial();
-	}
 	
 }
 
