@@ -165,6 +165,8 @@ protected:
 
 	void ExchangeInventoryItems(int32 CurrentItemIndex, int32 NewItemIndex);
 
+	UFUNCTION(BlueprintCallable)
+	void Footstep();
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
