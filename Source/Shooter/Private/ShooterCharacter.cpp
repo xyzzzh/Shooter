@@ -17,6 +17,8 @@
 #include "Weapon.h"
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
+#include "Shooter/Shooter.h"
 
 
 // Sets default values
@@ -361,7 +363,7 @@ void AShooterCharacter::FireButtonReleased()
 
 void AShooterCharacter::StartFireTimer()
 {
-	if(EquippedWeapon == nullptr)	return;
+	if (EquippedWeapon == nullptr) return;
 	CombatState = ECombatState::ECS_FireTimerInProgress;
 	GetWorldTimerManager().SetTimer(
 		AutoFireTimer,
@@ -788,7 +790,7 @@ void AShooterCharacter::ExchangeInventoryItems(int32 CurrentItemIndex, int32 New
 	}
 }
 
-void AShooterCharacter::Footstep()
+EPhysicalSurface AShooterCharacter::GetSurfaceType()
 {
 	FHitResult HitResult;
 	const FVector Start{GetActorLocation()};
@@ -796,7 +798,8 @@ void AShooterCharacter::Footstep()
 	FCollisionQueryParams QueryParams;
 	QueryParams.bReturnPhysicalMaterial = true;
 	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, QueryParams);
-	UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitResult.Actor->GetName());
+
+	return UPhysicalMaterial::DetermineSurfaceType(HitResult.PhysMaterial.Get());
 }
 
 int32 AShooterCharacter::GetInterpLocationIndex()
