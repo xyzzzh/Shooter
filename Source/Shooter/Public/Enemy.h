@@ -27,7 +27,7 @@ protected:
 	UParticleSystem* ImpactParticles;
 
 	// sound to play when hit by bullets
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	USoundCue* ImpactSound;
 	
 	
