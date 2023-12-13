@@ -28,7 +28,8 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void HideHealthBar();
-	
+
+	void Die();
 private:
 	
 	// particle to spawn when hit by bullets
