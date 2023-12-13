@@ -10,7 +10,10 @@
 AEnemy::AEnemy() :
 	Health(100.f),
 	MaxHealth(100.f),
-	HealthBarDisplayTime(4.f)
+	HealthBarDisplayTime(4.f),
+	bCanHitReact(true),
+	HitReactTimeMin(.5f),
+	HitReactTimeMax(3.f)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -37,12 +40,23 @@ void AEnemy::Die()
 
 void AEnemy::PlayHitMontage(FName Section, float PlayRate)
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if(AnimInstance)
+	if (bCanHitReact)
 	{
-		AnimInstance->Montage_Play(HitMontage, PlayRate);
-		AnimInstance->Montage_JumpToSection(Section);
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance)
+		{
+			AnimInstance->Montage_Play(HitMontage, PlayRate);
+			AnimInstance->Montage_JumpToSection(Section);
+		}
+		bCanHitReact = false;
+		const float HitReactTime{FMath::FRandRange(HitReactTimeMin, HitReactTimeMax)};
+		GetWorldTimerManager().SetTimer(HitReactTimer, this, &AEnemy::ResetHitReactTimer, HitReactTime);
 	}
+}
+
+void AEnemy::ResetHitReactTimer()
+{
+	bCanHitReact = true;
 }
 
 
