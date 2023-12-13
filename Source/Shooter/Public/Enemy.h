@@ -30,6 +30,8 @@ protected:
 	void HideHealthBar();
 
 	void Die();
+
+	void PlayHitMontage(FName Section, float PlayRate = 1.f);
 private:
 	
 	// particle to spawn when hit by bullets
@@ -56,7 +58,10 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	FTimerHandle HealthBarTimer;
-	
+
+	// hit and death montage
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* HitMontage;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
