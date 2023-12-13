@@ -12,6 +12,7 @@
 #include "Sound/SoundCue.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "DrawDebugHelpers.h"
+#include "Enemy.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Item.h"
 #include "Components/WidgetComponent.h"
@@ -610,12 +611,19 @@ void AShooterCharacter::SendBullet()
 		if (bBeamEnd)
 		{
 			// does hit actor implement BulletHitInterface?
-			if(BeamHitResult.Actor.IsValid())
+			if (BeamHitResult.Actor.IsValid())
 			{
 				IBulletHitInterface* BulletHitInterface = Cast<IBulletHitInterface>(BeamHitResult.Actor.Get());
-				if(BulletHitInterface)
+				if (BulletHitInterface)
 				{
 					BulletHitInterface->BulletHit_Implementation(BeamHitResult);
+				}
+
+				AEnemy* HitEnemy = Cast<AEnemy>(BeamHitResult.GetActor());
+				if (HitEnemy)
+				{
+					UGameplayStatics::ApplyDamage(BeamHitResult.GetActor(), EquippedWeapon->GetDamage(),
+					                              GetController(), this, UDamageType::StaticClass());
 				}
 			}
 			else
@@ -629,7 +637,7 @@ void AShooterCharacter::SendBullet()
 						BeamHitResult.Location);
 				}
 			}
-			
+
 			UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(
 				GetWorld(),
 				BeamParticles,
