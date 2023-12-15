@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "Enemy.generated.h"
 
+class UBehaviorTree;
 class USoundCue;
 
 UCLASS()
@@ -42,7 +43,6 @@ protected:
 	void DestoryHitNumber(UUserWidget* HitNumber);
 
 	void UpdateHitNumbers();
-
 
 private:
 	// particle to spawn when hit by bullets
@@ -90,6 +90,10 @@ private:
 	// time before a HitNumber is removed from the screen
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	float HitNumberDestroyTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Behavior Tree", meta = (AllowPrivateAccess = "true"))
+	UBehaviorTree* BehaviorTree;
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -102,8 +106,9 @@ public:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	                         AActor* DamageCauser) override;
 
-	FORCEINLINE FString GetHeadBone() const { return HeadBone; }
-
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowHitNumber(int32 Damage, FVector HitLocation, bool bHeadShot);
+
+	FORCEINLINE FString GetHeadBone() const { return HeadBone; }
+	FORCEINLINE UBehaviorTree* GetBehaviorTree() const { return BehaviorTree; }
 };
