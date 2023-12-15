@@ -4,6 +4,8 @@
 #include "Enemy.h"
 
 #include "DrawDebugHelpers.h"
+#include "EnemyController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -30,9 +32,18 @@ void AEnemy::BeginPlay()
 
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 
-	FVector WolrdPatrolPoint = UKismetMathLibrary::TransformLocation(GetActorTransform(), PatrolPoint);
-
+	EnemyController = Cast<AEnemyController>(GetController());
+	
+	const FVector WolrdPatrolPoint = UKismetMathLibrary::TransformLocation(GetActorTransform(), PatrolPoint);
 	DrawDebugSphere(GetWorld(), WolrdPatrolPoint, 25.f, 12, FColor::Red, true);
+
+	if(EnemyController)
+	{
+		EnemyController->GetBlackboardComponent()->SetValueAsVector(TEXT("PatrolPoint"), WolrdPatrolPoint);
+
+		EnemyController->RunBehaviorTree(BehaviorTree);
+	}
+	
 }
 
 void AEnemy::ShowHealthBar_Implementation()

@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "Enemy.generated.h"
 
+class AEnemyController;
 class UBehaviorTree;
 class USoundCue;
 
@@ -98,7 +99,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Behavior Tree", meta = (AllowPrivateAccess = "true", MakeEditWidget = "true"))
 	FVector PatrolPoint;
 
-	
+	AEnemyController* EnemyController;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
