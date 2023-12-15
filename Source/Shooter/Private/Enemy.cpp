@@ -3,8 +3,10 @@
 
 #include "Enemy.h"
 
+#include "DrawDebugHelpers.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Sound/SoundCue.h"
 
 // Sets default values
@@ -27,6 +29,10 @@ void AEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+
+	FVector WolrdPatrolPoint = UKismetMathLibrary::TransformLocation(GetActorTransform(), PatrolPoint);
+
+	DrawDebugSphere(GetWorld(), WolrdPatrolPoint, 25.f, 12, FColor::Red, true);
 }
 
 void AEnemy::ShowHealthBar_Implementation()
