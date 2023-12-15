@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "Enemy.generated.h"
 
+class USphereComponent;
 class AEnemyController;
 class UBehaviorTree;
 class USoundCue;
@@ -44,6 +45,16 @@ protected:
 	void DestoryHitNumber(UUserWidget* HitNumber);
 
 	void UpdateHitNumbers();
+
+	// called when something overlaps with the argo sphere
+	UFUNCTION()
+	void AgroSphereOverlap(
+		UPrimitiveComponent* OverlapedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
 
 private:
 	// particle to spawn when hit by bullets
@@ -96,14 +107,22 @@ private:
 	UBehaviorTree* BehaviorTree;
 
 	// point for the enemy to move to
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Behavior Tree", meta = (AllowPrivateAccess = "true", MakeEditWidget = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Behavior Tree",
+		meta = (AllowPrivateAccess = "true", MakeEditWidget = "true"))
 	FVector PatrolPoint;
 
 	// point for the enemy to move to
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Behavior Tree", meta = (AllowPrivateAccess = "true", MakeEditWidget = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Behavior Tree",
+		meta = (AllowPrivateAccess = "true", MakeEditWidget = "true"))
 	FVector PatrolPoint2;
-	
+
 	AEnemyController* EnemyController;
+
+	// overlap sphere for when the enemy becomes hostile
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat",
+		meta = (AllowPrivateAccess = "true", MakeEditWidget = "true"))
+	USphereComponent* AgroSphere;
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

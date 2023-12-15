@@ -5,8 +5,10 @@
 
 #include "DrawDebugHelpers.h"
 #include "EnemyController.h"
+#include "ShooterCharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Sound/SoundCue.h"
@@ -23,6 +25,9 @@ AEnemy::AEnemy() :
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	AgroSphere = CreateDefaultSubobject<USphereComponent>(TEXT("AgroSphere"));
+	AgroSphere->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned
@@ -30,23 +35,24 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	AgroSphere->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::AgroSphereOverlap);
+
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 
 	EnemyController = Cast<AEnemyController>(GetController());
-	
+
 	const FVector WolrdPatrolPoint = UKismetMathLibrary::TransformLocation(GetActorTransform(), PatrolPoint);
 	const FVector WolrdPatrolPoint2 = UKismetMathLibrary::TransformLocation(GetActorTransform(), PatrolPoint2);
 	DrawDebugSphere(GetWorld(), WolrdPatrolPoint, 25.f, 12, FColor::Red, true);
 	DrawDebugSphere(GetWorld(), WolrdPatrolPoint2, 25.f, 12, FColor::Red, true);
 
-	if(EnemyController)
+	if (EnemyController)
 	{
 		EnemyController->GetBlackboardComponent()->SetValueAsVector(TEXT("PatrolPoint"), WolrdPatrolPoint);
 		EnemyController->GetBlackboardComponent()->SetValueAsVector(TEXT("PatrolPoint2"), WolrdPatrolPoint2);
 
 		EnemyController->RunBehaviorTree(BehaviorTree);
 	}
-	
 }
 
 void AEnemy::ShowHealthBar_Implementation()
@@ -106,6 +112,18 @@ void AEnemy::UpdateHitNumbers()
 		FVector2D ScreenPosition;
 		UGameplayStatics::ProjectWorldToScreen(GetWorld()->GetFirstPlayerController(), Location, ScreenPosition);
 		HitNumber->SetPositionInViewport(ScreenPosition);
+	}
+}
+
+void AEnemy::AgroSphereOverlap(UPrimitiveComponent* OverlapedComponent, AActor* OtherActor,
+                               UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                               const FHitResult& SweepResult)
+{
+	if (OtherActor == nullptr) return;
+	auto Character = Cast<AShooterCharacter>(OtherActor);
+	if (Character)
+	{
+		EnemyController->GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Character);
 	}
 }
 
