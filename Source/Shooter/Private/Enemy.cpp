@@ -35,11 +35,14 @@ void AEnemy::BeginPlay()
 	EnemyController = Cast<AEnemyController>(GetController());
 	
 	const FVector WolrdPatrolPoint = UKismetMathLibrary::TransformLocation(GetActorTransform(), PatrolPoint);
+	const FVector WolrdPatrolPoint2 = UKismetMathLibrary::TransformLocation(GetActorTransform(), PatrolPoint2);
 	DrawDebugSphere(GetWorld(), WolrdPatrolPoint, 25.f, 12, FColor::Red, true);
+	DrawDebugSphere(GetWorld(), WolrdPatrolPoint2, 25.f, 12, FColor::Red, true);
 
 	if(EnemyController)
 	{
 		EnemyController->GetBlackboardComponent()->SetValueAsVector(TEXT("PatrolPoint"), WolrdPatrolPoint);
+		EnemyController->GetBlackboardComponent()->SetValueAsVector(TEXT("PatrolPoint2"), WolrdPatrolPoint2);
 
 		EnemyController->RunBehaviorTree(BehaviorTree);
 	}
