@@ -15,13 +15,15 @@
 
 // Sets default values
 AEnemy::AEnemy() :
-	Health(100.f),
 	MaxHealth(100.f),
+	Health(MaxHealth),
 	HealthBarDisplayTime(4.f),
 	bCanHitReact(true),
 	HitReactTimeMin(.5f),
 	HitReactTimeMax(3.f),
-	HitNumberDestroyTime(1.5f)
+	HitNumberDestroyTime(1.5f),
+	bStunned(false),
+	StunChance(.5f)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -153,6 +155,17 @@ void AEnemy::BulletHit_Implementation(FHitResult HitResult)
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, HitResult.Location, FRotator(0.f), true);
 	}
 	ShowHealthBar();
+	
+	// determine whether bullet hit stuns
+	const float Stunned = FMath::FRandRange(0.f, 1.f);
+	if(Stunned <= StunChance)
+	{
+		// stun the enemy
+		bStunned = true;
+		PlayHitMontage(FName("HitReactFront"));
+		
+	}
+	
 	PlayHitMontage(FName("HitReactFront"));
 }
 

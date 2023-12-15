@@ -119,9 +119,14 @@ private:
 	AEnemyController* EnemyController;
 
 	// overlap sphere for when the enemy becomes hostile
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat",
-		meta = (AllowPrivateAccess = "true", MakeEditWidget = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	USphereComponent* AgroSphere;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	bool bStunned;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float StunChance;
 
 public:
 	// Called every frame
