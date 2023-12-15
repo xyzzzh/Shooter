@@ -129,6 +129,16 @@ void AEnemy::AgroSphereOverlap(UPrimitiveComponent* OverlapedComponent, AActor* 
 	}
 }
 
+void AEnemy::SetStunned(bool Stunned)
+{
+	bStunned = Stunned;
+
+	if (EnemyController)
+	{
+		EnemyController->GetBlackboardComponent()->SetValueAsBool(TEXT("Stunned"), Stunned);
+	}
+}
+
 
 // Called every frame
 void AEnemy::Tick(float DeltaTime)
@@ -155,17 +165,17 @@ void AEnemy::BulletHit_Implementation(FHitResult HitResult)
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, HitResult.Location, FRotator(0.f), true);
 	}
 	ShowHealthBar();
-	
+
 	// determine whether bullet hit stuns
 	const float Stunned = FMath::FRandRange(0.f, 1.f);
-	if(Stunned <= StunChance)
+	if (Stunned <= StunChance)
 	{
 		// stun the enemy
-		bStunned = true;
+		SetStunned(true);
 		PlayHitMontage(FName("HitReactFront"));
 		
 	}
-	
+
 	PlayHitMontage(FName("HitReactFront"));
 }
 
