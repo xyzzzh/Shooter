@@ -8,6 +8,7 @@
 #include "ShooterCharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -50,6 +51,9 @@ void AEnemy::BeginPlay()
 	CombatRangeSphere->OnComponentEndOverlap.AddDynamic(this, &AEnemy::AEnemy::CombatRangeEndOverlap);
 
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	// ignore the camera for mesh and capsule
+	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
 	EnemyController = Cast<AEnemyController>(GetController());
 
@@ -173,7 +177,7 @@ void AEnemy::CombatRangeEndOverlap(UPrimitiveComponent* OverlapedComponent, AAct
 void AEnemy::PlayAttackMontage(FName Section, float PlayRate)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if(AnimInstance && AttackMontage)
+	if (AnimInstance && AttackMontage)
 	{
 		AnimInstance->Montage_Play(AttackMontage, PlayRate);
 		AnimInstance->Montage_JumpToSection(Section, AttackMontage);
