@@ -210,7 +210,7 @@ void AEnemy::PlayAttackMontage(FName Section, float PlayRate)
 	}
 	bCanAttack = false;
 	GetWorldTimerManager().SetTimer(AttackWaitTimer, this, &AEnemy::ResetCanAttack, AttackWaitTime);
-	if(EnemyController)
+	if (EnemyController)
 	{
 		EnemyController->GetBlackboardComponent()->SetValueAsBool(FName("CanAttack"), false);
 	}
@@ -267,7 +267,7 @@ void AEnemy::StunCharacter(AShooterCharacter* Character)
 void AEnemy::ResetCanAttack()
 {
 	bCanAttack = true;
-	if(EnemyController)
+	if (EnemyController)
 	{
 		EnemyController->GetBlackboardComponent()->SetValueAsBool(FName("CanAttack"), true);
 	}
@@ -383,6 +383,11 @@ void AEnemy::BulletHit_Implementation(FHitResult HitResult)
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
                          AActor* DamageCauser)
 {
+	if (EnemyController)
+	{
+		EnemyController->GetBlackboardComponent()->SetValueAsObject(FName("Target"), DamageCauser);
+	}
+
 	if (Health - DamageAmount <= 0.f)
 	{
 		Health = 0.f;
