@@ -34,7 +34,9 @@ AEnemy::AEnemy() :
 	AttackR(TEXT("AttackR")),
 	BaseDamage(20.f),
 	LeftWeaponSocket(TEXT("FX_Trail_L_01")),
-	RightWeaponSocket(TEXT("FX_Trail_R_01"))
+	RightWeaponSocket(TEXT("FX_Trail_R_01")),
+	bCanAttack(true),
+	AttackWaitTime(1.5f)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -91,6 +93,7 @@ void AEnemy::BeginPlay()
 		EnemyController->GetBlackboardComponent()->SetValueAsVector(TEXT("PatrolPoint2"), WolrdPatrolPoint2);
 
 		EnemyController->RunBehaviorTree(BehaviorTree);
+		EnemyController->GetBlackboardComponent()->SetValueAsBool(FName("CanAttack"), true);
 	}
 }
 
@@ -205,6 +208,12 @@ void AEnemy::PlayAttackMontage(FName Section, float PlayRate)
 		AnimInstance->Montage_Play(AttackMontage, PlayRate);
 		AnimInstance->Montage_JumpToSection(Section, AttackMontage);
 	}
+	bCanAttack = false;
+	GetWorldTimerManager().SetTimer(AttackWaitTimer, this, &AEnemy::ResetCanAttack, AttackWaitTime);
+	if(EnemyController)
+	{
+		EnemyController->GetBlackboardComponent()->SetValueAsBool(FName("CanAttack"), false);
+	}
 }
 
 FName AEnemy::GetAttackSectionName()
@@ -245,13 +254,22 @@ void AEnemy::SpawnBlood(AShooterCharacter* Character, FName Socket)
 
 void AEnemy::StunCharacter(AShooterCharacter* Character)
 {
-	if(Character)
+	if (Character)
 	{
 		const float Stun{FMath::FRandRange(0.0f, 1.0f)};
-		if(Stun <= Character->GetStunChance())
+		if (Stun <= Character->GetStunChance())
 		{
 			Character->Stun();
 		}
+	}
+}
+
+void AEnemy::ResetCanAttack()
+{
+	bCanAttack = true;
+	if(EnemyController)
+	{
+		EnemyController->GetBlackboardComponent()->SetValueAsBool(FName("CanAttack"), true);
 	}
 }
 
