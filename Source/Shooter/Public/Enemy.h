@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BulletHitInterface.h"
+#include "ShooterCharacter.h"
 #include "GameFramework/Character.h"
 #include "Enemy.generated.h"
 
@@ -112,7 +113,8 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void DeactivateRightWeapon();
 
-	void DoDamage(AActor* OtherActor);
+	void DoDamage(AShooterCharacter* Character);
+	void SpawnBlood(AShooterCharacter* Character, FName Socket);
 
 private:
 	// particle to spawn when hit by bullets
@@ -210,6 +212,12 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	float BaseDamage;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	FName LeftWeaponSocket;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	FName RightWeaponSocket;
+	
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

@@ -11,6 +11,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
+#include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Sound/SoundCue.h"
@@ -31,7 +32,9 @@ AEnemy::AEnemy() :
 	AttackRFast(TEXT("AttackRFast")),
 	AttackL(TEXT("AttackL")),
 	AttackR(TEXT("AttackR")),
-	BaseDamage(20.f)
+	BaseDamage(20.f),
+	LeftWeaponSocket(TEXT("FX_Trail_L_01")),
+	RightWeaponSocket(TEXT("FX_Trail_R_01"))
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -226,18 +229,46 @@ FName AEnemy::GetAttackSectionName()
 	return SectionName;
 }
 
+void AEnemy::SpawnBlood(AShooterCharacter* Character, FName Socket)
+{
+	const USkeletalMeshSocket* TipSocket{GetMesh()->GetSocketByName(Socket)};
+
+	if (TipSocket)
+	{
+		const FTransform SocketTransform{TipSocket->GetSocketTransform(GetMesh())};
+		if (Character->GetBloodParticles())
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Character->GetBloodParticles(), SocketTransform);
+		}
+	}
+}
+
 void AEnemy::OnLeftWeaponOverlap(UPrimitiveComponent* OverlapedComponent, AActor* OtherActor,
                                  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                                  const FHitResult& SweepResult)
 {
-	DoDamage(OtherActor);
+	if (OtherActor == nullptr) return;
+	auto Character = Cast<AShooterCharacter>(OtherActor);
+	if (Character)
+	{
+		DoDamage(Character);
+
+		SpawnBlood(Character, LeftWeaponSocket);
+	}
 }
 
 void AEnemy::OnRightWeaponOverlap(UPrimitiveComponent* OverlapedComponent, AActor* OtherActor,
                                   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                                   const FHitResult& SweepResult)
 {
-	DoDamage(OtherActor);
+	if (OtherActor == nullptr) return;
+	auto Character = Cast<AShooterCharacter>(OtherActor);
+	if (Character)
+	{
+		DoDamage(Character);
+
+		SpawnBlood(Character, RightWeaponSocket);
+	}
 }
 
 void AEnemy::ActivateLeftWeapon()
@@ -260,18 +291,13 @@ void AEnemy::DeactivateRightWeapon()
 	RightWeaponCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-void AEnemy::DoDamage(AActor* OtherActor)
+void AEnemy::DoDamage(AShooterCharacter* Character)
 {
-	if (OtherActor == nullptr) return;
-	auto Character = Cast<AShooterCharacter>(OtherActor);
-	if (Character)
-	{
-		UGameplayStatics::ApplyDamage(Character, BaseDamage, EnemyController, this, UDamageType::StaticClass());
+	UGameplayStatics::ApplyDamage(Character, BaseDamage, EnemyController, this, UDamageType::StaticClass());
 
-		if (Character->GetMeleeSound())
-		{
-			UGameplayStatics::PlaySoundAtLocation(this, Character->GetMeleeSound(), GetActorLocation());
-		}
+	if (Character->GetMeleeSound())
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, Character->GetMeleeSound(), GetActorLocation());
 	}
 }
 
