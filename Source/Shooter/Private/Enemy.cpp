@@ -108,7 +108,7 @@ void AEnemy::Die()
 {
 	if (bDying == true) return;
 	bDying = true;
-	
+
 	HideHealthBar();
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && DeathMontage)
@@ -386,6 +386,9 @@ void AEnemy::BulletHit_Implementation(FHitResult HitResult)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, HitResult.Location, FRotator(0.f), true);
 	}
+
+	if (bDying == true) return;
+
 	ShowHealthBar();
 
 	// determine whether bullet hit stuns
