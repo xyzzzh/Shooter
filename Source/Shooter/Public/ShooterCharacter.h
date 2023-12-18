@@ -175,6 +175,11 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void EndStun();
+	
+	void Die();
+
+	UFUNCTION(BlueprintCallable)
+	void FinishDeath();
 
 public:
 	// Called every frame
@@ -404,6 +409,11 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	float StunChance;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* DeathMontage;
+
+	bool bDying;
 
 public:
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

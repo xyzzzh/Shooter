@@ -13,10 +13,12 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "DrawDebugHelpers.h"
 #include "Enemy.h"
+#include "EnemyController.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Item.h"
 #include "Components/WidgetComponent.h"
 #include "Weapon.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
@@ -65,7 +67,8 @@ AShooterCharacter::AShooterCharacter() :
 	CombatState(ECombatState::ECS_Unoccupied),
 	Health(100.f),
 	MaxHealth(100.f),
-	StunChance(0.5f)
+	StunChance(0.5f),
+	bDying(false)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -118,6 +121,13 @@ float AShooterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 	if (Health - DamageAmount <= 0.f)
 	{
 		Health = 0.f;
+		Die();
+
+		auto EnemyController = Cast<AEnemyController>(EventInstigator);
+		if(EnemyController)
+		{
+			EnemyController->GetBlackboardComponent()->SetValueAsBool(FName("CharacterDead"), true);
+		}
 	}
 	else
 	{
@@ -870,6 +880,27 @@ void AShooterCharacter::EndStun()
 	CombatState = ECombatState::ECS_Unoccupied;
 }
 
+void AShooterCharacter::Die()
+{
+	if (bDying == true) return;
+	bDying = true;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && DeathMontage)
+	{
+		AnimInstance->Montage_Play(DeathMontage);
+	}
+}
+
+void AShooterCharacter::FinishDeath()
+{
+	GetMesh()->bPauseAnims = true;
+	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+	if (PC)
+	{
+		DisableInput(PC);
+	}
+}
+
 int32 AShooterCharacter::GetInterpLocationIndex()
 {
 	int32 LowestIndex = 1;
@@ -896,6 +927,7 @@ void AShooterCharacter::IncrementInterpLocItemCount(int32 Index, int32 Amount)
 
 void AShooterCharacter::Stun()
 {
+	if (Health <= 0.f) return;
 	CombatState = ECombatState::ECS_Stunned;
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
