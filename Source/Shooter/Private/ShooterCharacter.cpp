@@ -64,7 +64,8 @@ AShooterCharacter::AShooterCharacter() :
 	StartingARAmmo(120),
 	CombatState(ECombatState::ECS_Unoccupied),
 	Health(100.f),
-	MaxHealth(100.f)
+	MaxHealth(100.f),
+	StunChance(0.5f)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -270,7 +271,11 @@ bool AShooterCharacter::GetBeamEndLocation(
 
 void AShooterCharacter::AimingButtonPressed()
 {
-	bAiming = true;
+	if (CombatState != ECombatState::ECS_Reloading && CombatState != ECombatState::ECS_Equipping && CombatState !=
+		ECombatState::ECS_Stunned)
+	{
+		bAiming = true;
+	}
 }
 
 void AShooterCharacter::AimingButtonReleased()
@@ -393,6 +398,7 @@ void AShooterCharacter::StartFireTimer()
 
 void AShooterCharacter::AutoFireReset()
 {
+	if (CombatState == ECombatState::ECS_Stunned) return;
 	CombatState = ECombatState::ECS_Unoccupied;
 
 	if (WeaponHasAmmo())
@@ -859,6 +865,11 @@ EPhysicalSurface AShooterCharacter::GetSurfaceType()
 	return UPhysicalMaterial::DetermineSurfaceType(HitResult.PhysMaterial.Get());
 }
 
+void AShooterCharacter::EndStun()
+{
+	CombatState = ECombatState::ECS_Unoccupied;
+}
+
 int32 AShooterCharacter::GetInterpLocationIndex()
 {
 	int32 LowestIndex = 1;
@@ -880,6 +891,17 @@ void AShooterCharacter::IncrementInterpLocItemCount(int32 Index, int32 Amount)
 	if (InterpLocations.Num() >= Index)
 	{
 		InterpLocations[Index].ItemCount += Amount;
+	}
+}
+
+void AShooterCharacter::Stun()
+{
+	CombatState = ECombatState::ECS_Stunned;
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && HitReactMontage)
+	{
+		AnimInstance->Montage_Play(HitReactMontage);
 	}
 }
 
@@ -935,6 +957,7 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AShooterCharacter::FinishReloading()
 {
+	if (CombatState == ECombatState::ECS_Stunned) return;
 	// Update the Combat State
 	CombatState = ECombatState::ECS_Unoccupied;
 	if (EquippedWeapon == nullptr) return;
@@ -970,6 +993,7 @@ void AShooterCharacter::FinishReloading()
 
 void AShooterCharacter::FinishEquipping()
 {
+	if (CombatState == ECombatState::ECS_Stunned) return;
 	CombatState = ECombatState::ECS_Unoccupied;
 }
 

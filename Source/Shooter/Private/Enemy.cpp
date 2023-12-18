@@ -243,6 +243,18 @@ void AEnemy::SpawnBlood(AShooterCharacter* Character, FName Socket)
 	}
 }
 
+void AEnemy::StunCharacter(AShooterCharacter* Character)
+{
+	if(Character)
+	{
+		const float Stun{FMath::FRandRange(0.0f, 1.0f)};
+		if(Stun <= Character->GetStunChance())
+		{
+			Character->Stun();
+		}
+	}
+}
+
 void AEnemy::OnLeftWeaponOverlap(UPrimitiveComponent* OverlapedComponent, AActor* OtherActor,
                                  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                                  const FHitResult& SweepResult)
@@ -252,8 +264,8 @@ void AEnemy::OnLeftWeaponOverlap(UPrimitiveComponent* OverlapedComponent, AActor
 	if (Character)
 	{
 		DoDamage(Character);
-
 		SpawnBlood(Character, LeftWeaponSocket);
+		StunCharacter(Character);
 	}
 }
 
@@ -266,8 +278,8 @@ void AEnemy::OnRightWeaponOverlap(UPrimitiveComponent* OverlapedComponent, AActo
 	if (Character)
 	{
 		DoDamage(Character);
-
 		SpawnBlood(Character, RightWeaponSocket);
+		StunCharacter(Character);
 	}
 }
 
