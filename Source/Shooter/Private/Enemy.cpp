@@ -17,8 +17,8 @@
 
 // Sets default values
 AEnemy::AEnemy() :
+	Health(100.f),
 	MaxHealth(100.f),
-	Health(MaxHealth),
 	HealthBarDisplayTime(4.f),
 	bCanHitReact(true),
 	HitReactTimeMin(.5f),
@@ -30,7 +30,8 @@ AEnemy::AEnemy() :
 	AttackLFast(TEXT("AttackLFast")),
 	AttackRFast(TEXT("AttackRFast")),
 	AttackL(TEXT("AttackL")),
-	AttackR(TEXT("AttackR"))
+	AttackR(TEXT("AttackR")),
+	BaseDamage(20.f)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -68,7 +69,7 @@ void AEnemy::BeginPlay()
 	RightWeaponCollision->SetCollisionObjectType(ECC_WorldDynamic);
 	RightWeaponCollision->SetCollisionResponseToAllChannels(ECR_Ignore);
 	RightWeaponCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	
+
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	// ignore the camera for mesh and capsule
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
@@ -226,15 +227,47 @@ FName AEnemy::GetAttackSectionName()
 }
 
 void AEnemy::OnLeftWeaponOverlap(UPrimitiveComponent* OverlapedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                                 const FHitResult& SweepResult)
 {
-	
+	DoDamage(OtherActor);
 }
 
 void AEnemy::OnRightWeaponOverlap(UPrimitiveComponent* OverlapedComponent, AActor* OtherActor,
-                                  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                                  const FHitResult& SweepResult)
 {
-	
+	DoDamage(OtherActor);
+}
+
+void AEnemy::ActivateLeftWeapon()
+{
+	LeftWeaponCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void AEnemy::DeactivateLeftWeapon()
+{
+	LeftWeaponCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AEnemy::ActivateRightWeapon()
+{
+	RightWeaponCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void AEnemy::DeactivateRightWeapon()
+{
+	RightWeaponCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AEnemy::DoDamage(AActor* OtherActor)
+{
+	if (OtherActor == nullptr) return;
+	auto Character = Cast<AShooterCharacter>(OtherActor);
+	if (Character)
+	{
+		UGameplayStatics::ApplyDamage(Character, BaseDamage, EnemyController, this, UDamageType::StaticClass());
+	}
 }
 
 void AEnemy::SetStunned(bool Stunned)

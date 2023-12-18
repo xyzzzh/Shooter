@@ -62,7 +62,9 @@ AShooterCharacter::AShooterCharacter() :
 	//starting ammo amounts
 	Starting9mmAmmo(85),
 	StartingARAmmo(120),
-	CombatState(ECombatState::ECS_Unoccupied)
+	CombatState(ECombatState::ECS_Unoccupied),
+	Health(100.f),
+	MaxHealth(100.f)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -107,6 +109,21 @@ AShooterCharacter::AShooterCharacter() :
 
 	InterpComp5 = CreateDefaultSubobject<USceneComponent>(TEXT("Interpolation Component 5"));
 	InterpComp5->SetupAttachment(GetFollowCamera());
+}
+
+float AShooterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+                                    AActor* DamageCauser)
+{
+	if (Health - DamageAmount <= 0.f)
+	{
+		Health = 0.f;
+	}
+	else
+	{
+		Health -= DamageAmount;
+	}
+
+	return DamageAmount;
 }
 
 // Called when the game starts or when spawned
@@ -624,13 +641,13 @@ void AShooterCharacter::SendBullet()
 				{
 					int32 Damage{};
 					bool bHeadShot{};
-					if(BeamHitResult.BoneName.ToString() == HitEnemy->GetHeadBone())
+					if (BeamHitResult.BoneName.ToString() == HitEnemy->GetHeadBone())
 					{
 						// head shot
 						Damage = EquippedWeapon->GetHeadShotDamage();
 						bHeadShot = true;
 						UGameplayStatics::ApplyDamage(BeamHitResult.GetActor(), Damage,
-												  GetController(), this, UDamageType::StaticClass());
+						                              GetController(), this, UDamageType::StaticClass());
 					}
 					else
 					{
@@ -638,11 +655,10 @@ void AShooterCharacter::SendBullet()
 						Damage = EquippedWeapon->GetDamage();
 						bHeadShot = false;
 						UGameplayStatics::ApplyDamage(BeamHitResult.GetActor(), Damage,
-												  GetController(), this, UDamageType::StaticClass());
+						                              GetController(), this, UDamageType::StaticClass());
 					}
 
 					HitEnemy->ShowHitNumber(Damage, BeamHitResult.Location, bHeadShot);
-					
 				}
 			}
 			else
