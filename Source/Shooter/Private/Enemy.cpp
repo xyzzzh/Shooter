@@ -24,7 +24,11 @@ AEnemy::AEnemy() :
 	HitNumberDestroyTime(1.5f),
 	bStunned(false),
 	StunChance(.5f),
-	bInAttackRange(false)
+	bInAttackRange(false),
+	AttackLFast(TEXT("AttackLFast")),
+	AttackRFast(TEXT("AttackRFast")),
+	AttackL(TEXT("AttackL")),
+	AttackR(TEXT("AttackR"))
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -164,7 +168,16 @@ void AEnemy::CombatRangeEndOverlap(UPrimitiveComponent* OverlapedComponent, AAct
 			EnemyController->GetBlackboardComponent()->SetValueAsBool(TEXT("InAttackRange"), false);
 		}
 	}
-	
+}
+
+void AEnemy::PlayAttackMontage(FName Section, float PlayRate)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance && AttackMontage)
+	{
+		AnimInstance->Montage_Play(AttackMontage, PlayRate);
+		AnimInstance->Montage_JumpToSection(Section, AttackMontage);
+	}
 }
 
 void AEnemy::SetStunned(bool Stunned)
